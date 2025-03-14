@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/JAYKUMARGUPTA73/Real-state-nft#readme",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^16.4.7",

@@ -18,7 +18,6 @@ const verifyNFTOwnership = async (userId, propertyId) => {
 const buyShares = async (req, res) => {
     try {
         const { userId, propertyId, sharesToBuy } = req.body;
-
         // Validate input
         if (!isValidObjectId(userId) || !isValidObjectId(propertyId)) {
             return res.status(400).json({ error: "Invalid user or property ID" });
@@ -183,7 +182,6 @@ const sellShares = async (req, res) => {
 
 
 
-// Add a new property (Only if the user owns NFT)
 const addProperty = async (req, res) => {
   try {
     const {
