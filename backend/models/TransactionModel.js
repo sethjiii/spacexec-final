@@ -22,7 +22,7 @@ const transactionSchema = new mongoose.Schema({
     seller: { 
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'User', 
-        required: true 
+        default: null  // ✅ Can be `null` for primary purchases
     }, // User who sold the token  
 
     propertyId: { 
@@ -36,6 +36,12 @@ const transactionSchema = new mongoose.Schema({
         required: true, 
         min: 0 
     }, // Transaction value  
+
+    currency: { 
+        type: String, 
+        enum: ['USD', 'INR', 'EUR', 'GBP', 'BTC', 'ETH'], 
+        default: 'USD' 
+    }, // ✅ Added currency support  
 
     sharePercentage: { 
         type: Number, 
@@ -64,7 +70,8 @@ const transactionSchema = new mongoose.Schema({
         }, 
         referenceId: { 
             type: String, 
-            unique: true 
+            unique: true, 
+            sparse: true // ✅ Prevents errors if missing
         } 
     }, // Payment method & reference  
 
