@@ -1,0 +1,39 @@
+{
+  "name": "real-state-nft",
+  "version": "1.0.0",
+  "description": "This an nft based similar solution to fragmented ownership",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm start",
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JAYKUMARGUPTA73/Real-state-nft.git"
+  },
+  "keywords": [
+    "realstate",
+    "nfts",
+    "fragmented",
+    "ownership",
+    "buisness"
+  ],
+  "author": "jay kumar gupta",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JAYKUMARGUPTA73/Real-state-nft/issues"
+  },
+  "homepage": "https://github.com/JAYKUMARGUPTA73/Real-state-nft#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.12.1",
+    "morgan": "^1.10.0",
+    "nodemon": "^3.1.9",
+    "uuid": "^11.1.0"
+  }
+}
