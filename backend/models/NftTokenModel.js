@@ -65,4 +65,9 @@ const tokenSchema = new mongoose.Schema({
     timestamps: true 
 });
 
+tokenSchema.virtual('calculatedReturn').get(function () {
+    const returnPercentage = 10; // You can change this value based on your business logic
+    return (this.purchasePrice * returnPercentage) / 100;
+  });
+
 module.exports = mongoose.model('Token', tokenSchema);

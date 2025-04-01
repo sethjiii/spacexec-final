@@ -6,13 +6,15 @@ const {
     removeProperty,
     addPropertyByAdmin,
     buyShares,
-    sellShares
+    sellShares,
+    toggleWishList
 } = require('../controllers/propertyController');
 
 const propertyRouter = express.Router();
 
 // Property Management Routes
 propertyRouter.post('/add', addProperty);  // Add a new property (Only if the user owns NFT)
+propertyRouter.post('/togglewishlist/:propertyId', toggleWishList);  // Add a new property (Only if the user owns NFT)
 propertyRouter.post('/buyShares', buyShares);  // Add a new property (Only if the user owns NFT)
 propertyRouter.post('/sellshares', sellShares);  // Add a new property (Only if the user owns NFT)
 propertyRouter.post('/addbyadmin', addPropertyByAdmin);  // Add a new property (Only if the user owns NFT)

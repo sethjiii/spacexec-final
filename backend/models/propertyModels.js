@@ -6,42 +6,54 @@ const propertySchema = new mongoose.Schema({
         required: true, 
         trim: true 
     },  
-
+    title: { 
+        type: String, 
+        required: true, 
+        trim: true 
+    },  // Added missing title field
     location: { 
         type: String, 
         required: true, 
         trim: true 
     },  
-
     description: { 
         type: String, 
         trim: true 
-    },  // Detailed property description  
-
+    },  
+    type: { 
+        type: String, 
+        required: true,
+        trim: true
+    },  // Added missing type field
+    price: { 
+        type: Number, 
+        required: true, 
+        min: 0 
+    },  // Added missing price field
+    yield: { 
+        type: Number, 
+        required: true 
+    },  // Added missing yield field
     totalShares: { 
         type: Number, 
         required: true, 
         min: 1 
-    },  // Total available ownership shares  
-
+    },  
     availableShares: { 
         type: Number, 
         required: true, 
         min: 0 
-    }, // Shares still available for sale  
-
+    },  
     pricePerShare: { 
         type: Number, 
         required: true, 
         min: 0 
-    }, // Price per ownership share  
-
+    },  
     totalValue: { 
         type: Number, 
         required: true, 
         min: 0 
-    }, // Total estimated value of the property  
-
+    },  
     owners: [{ 
         userId: { 
             type: mongoose.Schema.Types.ObjectId, 
@@ -52,40 +64,95 @@ const propertySchema = new mongoose.Schema({
             min: 0, 
             max: 100 
         } 
-    }], // Users holding shares of the property  
-
+    }],  
     transactions: [{ 
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Transaction' 
-    }], // List of all transactions associated with this property  
-
+    }],  
     images: [{ 
         type: String, 
         required: true 
-    }], // Array of image URLs (stored in AWS S3, Firebase, IPFS, etc.)  
-
+    }],  
     documents: [{ 
         type: String, 
         required: false 
-    }], // Array of document URLs (title deeds, agreements, etc.)  
-
+    }],  
     metadataURI: { 
         type: String, 
         required: false, 
         trim: true 
-    }, // Link to additional metadata storage  
-
+    },  
     status: { 
         type: String, 
         enum: ['active', 'sold', 'under_review', 'inactive'], 
         default: 'active' 
-    }, // Property status  
-
+    },  
+    bedrooms: { 
+        type: Number, 
+        required: true 
+    },  
+    bathrooms: { 
+        type: Number, 
+        required: true 
+    },  
+    area: { 
+        type: Number, 
+        required: true,
+        min: 0 
+    },  // Added missing area field
+    amenities: [{ 
+        type: String 
+    }],  
+    return: {
+        rental: { type: Number, required: true },
+        appreciation: { type: Number, required: true },
+        total: { type: Number, required: true },
+    },  
+    financials: {
+        propertyPrice: { type: Number, required: true },
+        stampDuty: { type: Number, required: true },
+        registrationFee: { type: Number, required: true },
+        legalFee: { type: Number, required: true },
+        totalInvestment: { type: Number, required: true },
+        expectedRentalYield: { type: Number, required: true },
+        expectedAppreciation: { type: Number, required: true },
+        projectedReturn: { type: Number, required: true },
+    },  
+    fundingGoal: { 
+        type: Number, 
+        required: true 
+    },  
+    fundingRaised: { 
+        type: Number, 
+        required: true 
+    },  
+    vendorInfo: {
+        name: { type: String, required: true },
+        phone: { type: String, required: true },
+        email: { type: String, required: true }
+    },  
+    legalInfo: { 
+        type: String, 
+        required: true 
+    },  
+    riskFactors: [{ 
+        type: String 
+    }],  
+    offeringDetails: {
+        minInvestment: { type: Number, required: true },
+        maxInvestment: { type: Number, required: true },
+        investmentTerm: { type: Number, required: true },
+        exitOptions: [{ type: String }]
+    },  
     createdAt: { 
         type: Date, 
         default: Date.now, 
         immutable: true 
-    }  
+    },  
+    updatedAt: { 
+        type: Date, 
+        default: Date.now 
+    }  // Added updatedAt field for tracking changes
 }, { 
     timestamps: true 
 });

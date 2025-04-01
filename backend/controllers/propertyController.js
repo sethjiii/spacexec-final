@@ -19,7 +19,6 @@ const verifyNFTOwnership = async (userId, propertyId) => {
 const { v4: uuidv4 } = require("uuid");
 
 
-
 const buyShares = async (req, res) => {
     try {
         const { userId, propertyId, sharesToBuy, paymentMethod, referenceId } = req.body;
@@ -92,6 +91,8 @@ const buyShares = async (req, res) => {
             user.ownedTokens.push(existingToken._id);
         }
 
+
+
         // ✅ Update user's `investedProperties`
         const propertyIndex = user.investedProperties.findIndex(p => p.propertyId.equals(propertyId));
         if (propertyIndex > -1) {
@@ -123,6 +124,21 @@ const buyShares = async (req, res) => {
 
         // ✅ Push the transaction ID to `transactions` array in Property
         property.transactions.push(transaction._id);
+
+        const transaction_ = {
+          transaction_id: transactionId,
+          date: Date.now(),
+          amount: totalPrice,
+          type: "investment", // 'investment' or 'return'
+          propertyId: propertyId,
+          nftToken: {
+            tokenId:existingToken.tokenId
+          }, // NFT token information
+        };
+
+        console.log(transaction_)
+
+        user.transactions.push(transaction_)
 
         // ✅ Update property owners (Add user if not already in the list)
         const ownerIndex = property.owners.findIndex(owner => owner.userId.equals(userId));
@@ -333,92 +349,190 @@ const sellShares = async (req, res) => {
 const addProperty = async (req, res) => {
   try {
     const {
-      userId,
       name,
+      title,
       location,
       description,
+      type,
+      price,
+      yield: propertyYield,
       totalShares,
+      availableShares,
       pricePerShare,
       totalValue,
       images,
       documents,
+      bedrooms,
+      bathrooms,
+      area,
+      amenities,
+      fundingGoal,
+      fundingRaised,
+      vendorInfo,
+      legalInfo,
+      riskFactors,
+      return: returnData,
+      financials,
+      offeringDetails
     } = req.body;
 
-    // Verify if user owns an NFT for the property
-    const ownsNFT = await verifyNFTOwnership(userId, propertyId);
-    if (!ownsNFT) {
-      return res.status(403).json({
-        message: "Unauthorized: You must own an NFT to list this property.",
-      });
+    // Check for missing required fields
+    if (
+      !name || !title || !location || !description || !type || !price ||
+      !propertyYield || !totalShares || !availableShares || !pricePerShare ||
+      !totalValue || !images || !bedrooms || !bathrooms || !area || !fundingGoal ||
+      !fundingRaised || !vendorInfo || !legalInfo || !returnData || !financials || !offeringDetails
+    ) {
+      return res.status(400).json({ message: "Missing required fields!" });
     }
 
+    // Create the property
     const newProperty = new Property({
       name,
+      title,
       location,
       description,
+      type,
+      price,
+      yield: propertyYield,
       totalShares,
-      availableShares: totalShares,
+      availableShares,
       pricePerShare,
       totalValue,
       images,
       documents,
-      owners: [{ userId, sharePercentage: 100 }], // Initially full ownership
+      bedrooms,
+      bathrooms,
+      area,
+      amenities,
+      fundingGoal,
+      fundingRaised,
+      vendorInfo,
+      legalInfo,
+      riskFactors,
+      return: returnData,
+      financials,
+      offeringDetails
     });
 
     await newProperty.save();
-    res
-      .status(201)
-      .json({ message: "Property added successfully!", property: newProperty });
+    res.status(201).json({ message: "Property added successfully!", property: newProperty });
   } catch (error) {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
 
+
+
+
 const addPropertyByAdmin = async (req, res) => {
   try {
     // Extract JWT token from Authorization header
-    const token = req.headers.authorization?.split(" ")[1];
-
-    if (!token) {
-      return res
-        .status(401)
-        .json({ message: "Unauthorized: No token provided" });
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ message: "Unauthorized: No token provided" });
     }
 
-    // Verify token and extract user ID
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const adminId = decoded.userId; // Extracted user ID from token
+    const token = authHeader.split(" ")[1];
+
+    // Verify token
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      return res.status(401).json({ message: "Unauthorized: Invalid token" });
+    }
+
+    const adminId = decoded.userId; // Extract user ID from token
 
     // Check if the user is an admin
     const adminUser = await User.findById(adminId);
     if (!adminUser || adminUser.role !== "admin") {
-      return res
-        .status(403)
-        .json({ message: "Unauthorized: Only admins can add properties" });
+      return res.status(403).json({ message: "Unauthorized: Only admins can add properties" });
     }
 
+    // Extract property details from request body
     const {
       name,
+      title,
       location,
       description,
+      type,
+      price,
+      yield: propertyYield,
       totalShares,
+      availableShares,
       pricePerShare,
       totalValue,
       images,
-      documents,
+      documents = [],
+      bedrooms,
+      bathrooms,
+      area,
+      amenities = [],
+      fundingGoal,
+      fundingRaised,
+      vendorInfo,
+      legalInfo,
+      riskFactors = [],
+      return: returnData,
+      financials,
+      offeringDetails
     } = req.body;
 
+    // Validate required fields
+    if (
+      !name || !title || !location || !description || !type || price === undefined ||
+      propertyYield === undefined || totalShares === undefined || availableShares === undefined ||
+      pricePerShare === undefined || totalValue === undefined || !images?.length ||
+      bedrooms === undefined || bathrooms === undefined || area === undefined ||
+      fundingGoal === undefined || fundingRaised === undefined ||
+      !vendorInfo?.name || !vendorInfo?.phone || !vendorInfo?.email ||
+      !legalInfo || !returnData || !financials || !offeringDetails
+    ) {
+      return res.status(400).json({ message: "Missing required fields!" });
+    }
+
+    // Ensure availableShares does not exceed totalShares
+    if (availableShares > totalShares) {
+      return res.status(400).json({ message: "Available shares cannot exceed total shares." });
+    }
+
+    // Ensure fundingRaised does not exceed fundingGoal
+    if (fundingRaised > fundingGoal) {
+      return res.status(400).json({ message: "Funding raised cannot exceed funding goal." });
+    }
+
+    // Create new property
     const newProperty = new Property({
       name,
+      title,
       location,
       description,
+      type,
+      price,
+      yield: propertyYield,
       totalShares,
-      availableShares: totalShares,
+      availableShares,
       pricePerShare,
       totalValue,
       images,
       documents,
+      bedrooms,
+      bathrooms,
+      area,
+      amenities,
+      fundingGoal,
+      fundingRaised,
+      vendorInfo,
+      legalInfo,
+      riskFactors,
+      return: returnData,
+      financials,
+      offeringDetails,
       owners: [], // No initial ownership assigned
+      createdAt: new Date(),
+      updatedAt: new Date()
     });
 
     await newProperty.save();
@@ -427,9 +541,55 @@ const addPropertyByAdmin = async (req, res) => {
       property: newProperty,
     });
   } catch (error) {
+    console.error("Error adding property:", error);
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+
+
+
+const toggleWishList = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const { propertyId } = req.params;
+
+    // Validate propertyId
+    if (!mongoose.Types.ObjectId.isValid(propertyId)) {
+      return res.status(400).json({ message: "Invalid Property ID" });
+    }
+
+    // Check if property exists
+    const property = await Property.findById(propertyId);
+    if (!property) {
+      return res.status(404).json({ message: "Property not found" });
+    }
+
+    // Find user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if property is already in the wishlist
+    const isInWishlist = user.wishlist.includes(propertyId);
+
+    if (isInWishlist) {
+      // Remove from wishlist
+      user.wishlist = user.wishlist.filter((id) => id.toString() !== propertyId);
+      await user.save();
+      return res.status(200).json({ message: "Property removed from wishlist", wishlist: user.wishlist });
+    } else {
+      // Add to wishlist
+      user.wishlist.push(propertyId);
+      await user.save();
+      return res.status(200).json({ message: "Property added to wishlist", wishlist: user.wishlist });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
+
+
 
 // Get a single property by ID
 const getPropertyById = async (req, res) => {
@@ -508,4 +668,5 @@ module.exports = {
   getPropertyById,
   getAllProperties,
   removeProperty,
+  toggleWishList
 };

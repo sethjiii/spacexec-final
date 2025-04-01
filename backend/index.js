@@ -16,7 +16,15 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors()); // Enable CORS for cross-origin requests
+app.use(
+    cors({
+        // https://53c4-2401-4900-a18c-58f4-cdd4-8bcc-f50d-1323.ngrok-free.app/health
+      origin: "http://localhost:8080", // Update this to match your frontend URL
+      methods: ["GET", "POST", "PUT", "DELETE"],
+      credentials: true, // Allows cookies & authentication headers
+    })
+  );
+// app.use(cors()); // Enable CORS for cross-origin requests
 app.use(helmet()); // Security middleware
 app.use(morgan('dev')); // HTTP request logger
 
