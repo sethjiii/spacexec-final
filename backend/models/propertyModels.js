@@ -84,8 +84,8 @@ const propertySchema = new mongoose.Schema({
     },  
     status: { 
         type: String, 
-        enum: ['active', 'sold', 'under_review', 'inactive'], 
-        default: 'active' 
+        enum: ['active','under_review', 'inactive'], 
+        default: 'under_review'
     },  
     bedrooms: { 
         type: Number, 
