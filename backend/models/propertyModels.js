@@ -5,7 +5,11 @@ const propertySchema = new mongoose.Schema({
         type: String, 
         required: true, 
         trim: true 
-    },  
+    },
+    primary_lister:{
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'User' 
+    },
     title: { 
         type: String, 
         required: true, 
@@ -84,7 +88,7 @@ const propertySchema = new mongoose.Schema({
     },  
     status: { 
         type: String, 
-        enum: ['active','under_review', 'inactive'], 
+        enum: ['active','under_review', 'disabled'], 
         default: 'under_review'
     },  
     bedrooms: { 
@@ -140,8 +144,8 @@ const propertySchema = new mongoose.Schema({
     }],  
     offeringDetails: {
         minInvestment: { type: Number, required: true },
-        maxInvestment: { type: Number, required: true },
-        investmentTerm: { type: Number, required: true },
+        maxInvestment: { type: Number },
+        investmentTerm: { type: Number },
         exitOptions: [{ type: String }]
     },  
     createdAt: { 

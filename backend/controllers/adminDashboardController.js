@@ -116,6 +116,62 @@ const admindashboarddata = async (req, res) => {
   }
 };
 
+const alluserdata = async (req, res) => {
+  try {
+    const users = await usersModel.find({}, 'name email phone investedProperties createdAt role');
+
+    const formattedUsers = users.map(user => ({
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+      role:user.role,
+      phone: user.phone || "N/A",
+      investments: user.investedProperties?.length || 0,
+      joinedDate: new Date(user.createdAt).toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+      })
+    }));
+
+    res.status(200).json(formattedUsers);
+  } catch (error) {
+    console.error("Error fetching users data:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+const allvendordata = async (req, res) => {
+  try {
+    const users = await usersModel.find(
+      { role: 'vendor' },
+      'isVerified name email phone investedProperties createdAt role'
+    );
+
+    const formattedUsers = users.map(user => ({
+      id: user._id.toString(),
+      name: user.name,
+      type: user.role,
+      status: user.isVerified,
+      ratings: "5",
+      phone: user.phone || "N/A",
+      properties: user.investedProperties?.length || 0,
+      joinedDate: new Date(user.createdAt).toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+      })
+    }));
+
+    res.status(200).json(formattedUsers);
+  } catch (error) {
+    console.error("Error fetching vendor data:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+
+
 // Helper function to format time difference
 function timeSince(date) {
   const seconds = Math.floor((new Date() - date) / 1000);
@@ -127,4 +183,4 @@ function timeSince(date) {
   return Math.floor(seconds) + " seconds";
 }
 
-module.exports = { admindashboarddata };
+module.exports = { admindashboarddata,alluserdata,allvendordata};

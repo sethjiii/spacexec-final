@@ -22,8 +22,11 @@ app.use(
       origin: "http://localhost:8080", // Update this to match your frontend URL
       methods: ["GET", "POST", "PUT", "DELETE"],
       credentials: true, // Allows cookies & authentication headers
+      allowedHeaders: ["Content-Type", "Authorization"], // Allow headers like Content-Type and Authorization
     })
   );
+
+  app.options('*', cors());
 
   
 // app.use(cors()); // Enable CORS for cross-origin requests

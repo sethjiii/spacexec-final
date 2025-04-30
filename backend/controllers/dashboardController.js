@@ -20,13 +20,14 @@ const dashboarddata = async (req, res) => {
               model: "Property",
             },
           }).populate("wishlist"); // Populate the ownedTokens field (adjust if necessary)
-  
+
+          // console.log(user);
       // If the user is not found
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
 
-    //   console.log(user.ownedTokens)
+      console.log(user.ownedTokens)
 
       const wishlist = user.wishlist.map((property) => ({
         id: property._id,
@@ -71,45 +72,49 @@ const dashboarddata = async (req, res) => {
         { name: "Jun", invested: 4500, totalInvested: 22000, portfolioValue: 22500 },
       ];
 
-      const portfolio = user.ownedTokens.map((token) => ({
-        
-        nftToken:token.tokenId,
-        id: token.property._id, // Access property correctly
-        title: token.property.name, // Property title
-        location: token.property.location, // Location of the property
-        price: token.property.price, // Price of the property
-        yield: token.property.yield, // Yield of the property
-        minInvestment: token.property.offeringDetails?.minInvestment || 0, // Handle potential undefined
-        image: token.property.images?.[0] || "", // Handle missing image
-        type: token.property.type, // Type of the property
-        area: token.property.area, // Area of the property
-        investedAmount: token.purchasePrice, // Use purchasePrice for invested amount
-        ownership: ((token.sharesOwned / token.property.totalShares) * 100).toFixed(2), // Calculate ownership %
-        returns: ((token.sharesOwned * token.property.pricePerShare) * (token.property.yield / 100)).toFixed(2), // Approximate returns
-        purchaseDate: token.createdAt, // Date when the token was created
-      }));
+      const portfolio = user.ownedTokens
+  .filter((token) => token.property) // Filter out tokens where property is missing
+  .map((token) => ({
+    nftToken: token.tokenId,
+    id: token.property._id,
+    title: token.property.name,
+    location: token.property.location,
+    price: token.property.price,
+    yield: token.property.yield,
+    minInvestment: token.property.offeringDetails?.minInvestment || 0,
+    image: token.property.images?.[0] || "",
+    type: token.property.type,
+    area: token.property.area,
+    investedAmount: token.purchasePrice,
+    ownership: ((token.sharesOwned / token.property.totalShares) * 100).toFixed(2),
+    returns: ((token.sharesOwned * token.property.pricePerShare) * (token.property.yield / 100)).toFixed(2),
+    purchaseDate: token.createdAt,
+  }));
+
       
 
       console.log("portfolio_");
       console.log(user.ownedTokens);
       
 
-      const portfolio_ = user.investedProperties.map((property) => ({
-        id: property.propertyId._id,
-        title: property.propertyId.title,
-        location: property.propertyId.location,
-        price: property.propertyId.price,
-        yield: property.propertyId.yield,
-        minInvestment: property.propertyId.offeringDetails.minInvestment, // Assuming minInvestment is part of offeringDetails in Property schema
-        image: property.propertyId.images[0], // Assuming first image for simplicity
-        type: property.propertyId.type,
-        area: property.propertyId.area,
-        investedAmount: 1000,
-        ownership: 0.2,
-        returns: 3000,
-        purchaseDate: property.createdAt,
-    
-      }));
+      const portfolio_ = user.investedProperties
+  .filter((property) => property.propertyId) // Filter out deleted properties
+  .map((property) => ({
+    id: property.propertyId._id,
+    title: property.propertyId.title,
+    location: property.propertyId.location,
+    price: property.propertyId.price,
+    yield: property.propertyId.yield,
+    minInvestment: property.propertyId.offeringDetails?.minInvestment || 0,
+    image: property.propertyId.images?.[0] || "",
+    type: property.propertyId.type,
+    area: property.propertyId.area,
+    investedAmount: 1000,
+    ownership: 0.2,
+    returns: 3000,
+    purchaseDate: property.createdAt,
+  }));
+
   
       // Define the response structure with user data and charts
       const response = {

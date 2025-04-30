@@ -9,8 +9,9 @@ const {
     logout
 } = require('../controllers/userController');
 const { dashboarddata } = require('../controllers/dashboardController');
-const { admindashboarddata } = require('../controllers/adminDashboardController');
-const { addComplaint } = require('../controllers/supprtController');
+const { admindashboarddata, alluserdata, allvendordata } = require('../controllers/adminDashboardController');
+const { addComplaint, getActiveSupportTickets, findTicketBySupportId, addChatToTicket } = require('../controllers/supprtController');
+const { vendordashboarddata } = require('../controllers/vendorDashboardController');
 
 const userRouter = express.Router();
 
@@ -21,6 +22,9 @@ userRouter.post('/logout', logout);  // User login
 
 // complains 
 userRouter.post('/addcomplaint',addComplaint)
+userRouter.post('/addchat',addChatToTicket)
+userRouter.get('/getchat/:supportId',findTicketBySupportId)
+userRouter.get('/activetickets/:userId',getActiveSupportTickets)
 
 // User Profile & Ownership
 userRouter.get('/:userId', getUserProfile);  // Get user profile
@@ -33,4 +37,9 @@ userRouter.delete('/delete/:userId', deleteUser);  // Delete user (if no NFTs ar
 
 // admin routes
 userRouter.post('/admindashboard',admindashboarddata);
+userRouter.post('/admindashboard/usersdata',alluserdata);
+userRouter.post('/admindashboard/vendorsdata',allvendordata);
+
+// vendor routes
+userRouter.post('/vendordashboard/:vendorId',vendordashboarddata);
 module.exports = userRouter;

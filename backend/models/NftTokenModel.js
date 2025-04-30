@@ -32,7 +32,7 @@ const tokenSchema = new mongoose.Schema({
         required: true, 
         min: 0 
     },  // total Price paid for the tokenized shares  
-
+    
     previousOwners: [{ 
         userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, 
         transferredAt: { type: Date, default: Date.now } 
