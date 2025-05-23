@@ -17,7 +17,9 @@ const {
     disableProperty,
     approveProperty,
     deleteProperty,
-    verifySignature
+    verifySignature,
+    createListing,
+    getAllMarketPlace
 } = require('../controllers/propertyController');
 const { isAdmin } = require('../middlewares/isAdmin');
 const { verifyNFTOwnership } = require('../controllers/userController');
@@ -50,5 +52,8 @@ propertyRouter.delete("/delete/:propertyId", isAdmin, deleteProperty);
 
 // marketplace urls
 propertyRouter.post("/verifysignature",verifySignature)
+propertyRouter.post("/listnft",createListing)
+propertyRouter.post("/getmarketplace", getAllMarketPlace);
+
 
 module.exports = propertyRouter;

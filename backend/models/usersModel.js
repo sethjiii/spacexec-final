@@ -57,7 +57,18 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: null
     },
+    // id of channel partner who added this user
+    my_channel_partner:{
+        type: mongoose.Schema.Types.ObjectId, 
+        ref:'ChannelPartner'
+    },
 
+    // this my id when i am aprroved as a channel partner
+    channel_partner_id:{
+        type: mongoose.Schema.Types.ObjectId, 
+        ref:'ChannelPartner'
+    },
+    
     ownedTokens: [{ 
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Token' 

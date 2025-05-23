@@ -11,7 +11,10 @@ const { v4: uuidv4 } = require("uuid");
 const { v2: cloudinary } = require("cloudinary");
 const SalesModel = require("../models/SalesModel");
 const propertyModels = require("../models/propertyModels");
+const MarketplaceListing=require("../models/MarketPlaceModel")
 const crypto = require('crypto');
+const NftTokenModel = require("../models/NftTokenModel");
+const MarketPlaceModel = require("../models/MarketPlaceModel");
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -277,20 +280,25 @@ const sellShares = async (req, res) => {
       propertyId,
       sharesToSell,
       buyerId,
-      signature,
       paymentMethod,
       referenceId,
+      marketplaceId,
+      investmentAmount
     } = req.body;
+
+    console.log(req.body);
 
     // Validate input
     if (!isValidObjectId(sellerId) || !isValidObjectId(propertyId)) {
       return res.status(400).json({ error: "Invalid seller or property ID" });
     }
+
     if (sharesToSell <= 0) {
       return res
         .status(400)
         .json({ error: "Shares to sell must be greater than 0" });
     }
+
     if (
       !paymentMethod ||
       !["bank_transfer", "credit_card", "UPI", "crypto"].includes(paymentMethod)
@@ -298,42 +306,40 @@ const sellShares = async (req, res) => {
       return res.status(400).json({ error: "Invalid payment method" });
     }
 
-    // Fetch seller's token
+    // ✅ Check if listing exists in the marketplace if marketplaceId is provided
+    if (marketplaceId) {
+      if (!isValidObjectId(marketplaceId)) {
+        return res.status(400).json({ error: "Invalid marketplace ID" });
+      }
+
+      const listing = await MarketPlaceModel.findById(marketplaceId);
+      if (!listing) {
+        return res.status(404).json({ error: "Marketplace listing not found" });
+      }
+    }
+
+    // ✅ Fetch seller's token
     const sellerToken = await Token.findOne({
       owner: sellerId,
       property: propertyId,
     });
+
     if (!sellerToken || sellerToken.sharesOwned < sharesToSell) {
       return res
         .status(400)
         .json({ error: "Seller does not have enough shares to sell" });
     }
 
-    // Validate seller's signature
-    const isValidSignature = verifyTokenSignature({
-      tokenId: sellerToken.tokenId,
-      userId: sellerId,
-      propertyId,
-      issuedAt: sellerToken.issuedAt,
-      signature,
-    });
-
-    if (!isValidSignature) {
-      return res.status(403).json({ error: "Invalid token signature" });
-    }
-
-    // Fetch Property Details
+    // ✅ Fetch property
     const property = await Property.findById(propertyId);
     if (!property) {
       return res.status(404).json({ error: "Property not found" });
     }
 
-    // ✅ Calculate Sale Price
-    const totalPrice = sharesToSell * property.pricePerShare;
+    const totalPrice = investmentAmount;
     let newSignature = null;
 
     if (buyerId) {
-      // Buyer case
       if (!isValidObjectId(buyerId)) {
         return res.status(400).json({ error: "Invalid buyer ID" });
       }
@@ -344,19 +350,16 @@ const sellShares = async (req, res) => {
       });
 
       if (buyerToken) {
-        // ✅ Buyer already owns shares, update existing token
         buyerToken.sharesOwned += sharesToSell;
-        buyerToken.purchasePrice += totalPrice; // ✅ Update purchase price
+        buyerToken.purchasePrice += totalPrice;
         await buyerToken.save();
 
-        // Generate a new signature for buyer's updated token
         newSignature = generateToken(
           buyerToken.tokenId,
           buyerId,
           propertyId
         ).signature;
       } else {
-        // ✅ Generate a new token for the buyer
         const issuedAt = Date.now();
         const newTokenData = generateToken(null, buyerId, propertyId);
         newSignature = newTokenData.signature;
@@ -366,12 +369,11 @@ const sellShares = async (req, res) => {
           owner: buyerId,
           property: propertyId,
           sharesOwned: sharesToSell,
-          purchasePrice: totalPrice, // ✅ Save purchase price
+          purchasePrice: totalPrice,
           issuedAt,
         });
       }
 
-      // ✅ Update Buyer's Owned Tokens
       const buyer = await User.findById(buyerId);
       if (buyer) {
         if (
@@ -380,10 +382,10 @@ const sellShares = async (req, res) => {
           buyer.ownedTokens.push(buyerToken._id);
         }
 
-        // ✅ Update Buyer's Invested Properties
         const propertyIndex = buyer.investedProperties.findIndex((p) =>
           p.propertyId.equals(propertyId)
         );
+
         if (propertyIndex > -1) {
           buyer.investedProperties[propertyIndex].sharePercentage +=
             (sharesToSell / property.totalShares) * 100;
@@ -397,19 +399,17 @@ const sellShares = async (req, res) => {
         await buyer.save();
       }
     } else {
-      // ✅ Selling back to property
       property.availableShares += sharesToSell;
       await property.save();
     }
 
-    // ✅ Reduce Seller's Shares
+    // ✅ Reduce Seller Shares
     sellerToken.sharesOwned -= sharesToSell;
-    sellerToken.purchasePrice -= totalPrice; // ✅ Deduct purchase price proportionally
+    sellerToken.purchasePrice -= totalPrice;
 
     if (sellerToken.sharesOwned === 0) {
       await Token.deleteOne({ _id: sellerToken._id });
 
-      // ✅ Remove Token from Seller’s Owned Tokens
       const seller = await User.findById(sellerId);
       if (seller) {
         seller.ownedTokens = seller.ownedTokens.filter(
@@ -421,12 +421,12 @@ const sellShares = async (req, res) => {
       await sellerToken.save();
     }
 
-    // ✅ Log the Transaction
+    // ✅ Create transaction
     const transactionId = uuidv4();
     const transaction = await Transaction.create({
       transactionId,
       tokenId: sellerToken._id,
-      buyer: buyerId || null, // If no buyer, it's a sell-back transaction
+      buyer: buyerId || null,
       seller: sellerId,
       propertyId,
       amount: totalPrice,
@@ -435,14 +435,13 @@ const sellShares = async (req, res) => {
       status: "completed",
       paymentDetails: {
         method: paymentMethod,
-        referenceId: referenceId || uuidv4(), // If no referenceId, auto-generate one
+        referenceId: referenceId || uuidv4(),
       },
     });
 
-    // ✅ Push Transaction ID to Property Transactions
     property.transactions.push(transaction._id);
 
-    // ✅ Update Property Ownership (Remove Seller, Add Buyer)
+    // ✅ Update property owners
     const sellerIndex = property.owners.findIndex((owner) =>
       owner.userId.equals(sellerId)
     );
@@ -471,16 +470,130 @@ const sellShares = async (req, res) => {
 
     await property.save();
 
+    // ✅ Delete Marketplace listing if provided
+    if (marketplaceId && isValidObjectId(marketplaceId)) {
+      try {
+        await MarketPlaceModel.deleteOne({ _id: marketplaceId });
+        console.log(`Marketplace listing ${marketplaceId} deleted successfully.`);
+      } catch (deleteErr) {
+        console.error("Failed to delete marketplace listing:", deleteErr);
+      }
+    }
+
     res.status(200).json({
       message: "Shares sold successfully!",
       transactionId,
-      newSignature, // Only for buyer verification (not stored)
+      newSignature,
     });
   } catch (error) {
     console.error("Sell Shares Error:", error);
     res.status(500).json({ error: "Failed to sell shares" });
   }
 };
+
+
+const createListing = async (req, res) => {
+  try {
+    const {
+      sellerId,
+      propertyId,
+      nftTokenId,
+      sharePercentage,
+      listingPrice,
+      royalties,
+    } = req.body;
+
+    // Validate required fields
+    if (
+      !sellerId ||
+      !propertyId ||
+      !nftTokenId ||
+      !sharePercentage ||
+      !listingPrice
+    ) {
+      return res.status(401).json({ message: "Missing required fields" });
+    }
+
+    // Check if already listed
+    const alreadyListed = await MarketplaceListing.findOne({
+      nftTokenId,
+      sellerId,
+    });
+
+    if (alreadyListed) {
+      return res.status(401).json({
+        message: "You already have a listing associated with this NFT",
+      });
+    }
+
+    // Get token data
+    const savedNftToken = await NftTokenModel.findOne({ tokenId: nftTokenId });
+
+    if (!savedNftToken) {
+      return res.status(404).json({ message: "NFT token not found" });
+    }
+
+    // Calculate price per share
+    const shareCount=savedNftToken.sharesOwned*sharePercentage/100;
+    const pricePerShare =
+      listingPrice/shareCount;
+
+
+    // Create listing
+    const newListing = new MarketplaceListing({
+      sellerId,
+      propertyId,
+      nftTokenId,
+      sharePercentage,
+      listingPrice,
+      pricePerShare,
+      royalties: royalties ?? 0.02,
+      shareCount
+    });
+
+    const savedListing = await newListing.save();
+    res.status(201).json({
+      message: "Listing created successfully",
+      listing: savedListing,
+    });
+  } catch (error) {
+    console.error("Error creating listing:", error);
+    res
+      .status(500)
+      .json({ error: "Server error while creating listing" });
+  }
+};
+
+const getAllMarketPlace = async (req, res) => {
+  try {
+    console.log("Fetching marketplace listings...");
+
+    const listings = await MarketplaceListing.find({ status: "listed" })
+    .populate("sellerId", "name email")
+    .populate({
+      path: "propertyId",
+      populate: {
+        path: "owners.userId", // populate userId inside each owner
+        model: "User",
+        select: "name email", // Optional: limit fields
+      },
+    });
+  
+
+  
+    res.status(200).json({
+      message: "Listings fetched successfully",
+      count: listings.length,
+      listings, // renamed from `listing` to plural for clarity
+    });
+  } catch (error) {
+    console.error("Error fetching listings:", error);
+    res.status(500).json({
+      error: "Server error while fetching listings",
+    });
+  }
+};
+
 
 const addProperty = async (req, res) => {
   try {
@@ -1029,5 +1142,7 @@ module.exports = {
   deleteProperty,
   approveProperty,
   disableProperty,
-  verifySignature
+  verifySignature,
+  createListing,
+  getAllMarketPlace
 };

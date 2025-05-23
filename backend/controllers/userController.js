@@ -160,6 +160,65 @@ const loginUser = async (req, res) => {
 };
 
 
+const loginWithEmailPassword = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ error: "Email and password are required" });
+        }
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ error: "Invalid email" });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ error: "Invalid email or password" });
+        }
+
+        // Set token expiration based on role
+        let expiresIn;
+        switch (user.role) {
+            case "admin":
+                expiresIn = 6 * 60 * 60 * 1000;
+                break;
+            case "vendor":
+                expiresIn = 7 * 24 * 60 * 60 * 1000;
+                break;
+            case "channel-partner":
+                expiresIn = 10 * 24 * 60 * 60 * 1000;
+                break;
+            default:
+                expiresIn = 30 * 24 * 60 * 60 * 1000;
+        }
+
+        const token = jwt.sign(
+            { userId: user._id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn }
+        );
+
+        const { _id, name, profile_pic, role } = user;
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            maxAge: expiresIn,
+            path: "/",
+            sameSite: "lax",
+            secure: process.env.NODE_ENV === "production",
+        });
+
+        res.status(200).json({ token, _id, name, profile_pic, role, email: user.email });
+
+    } catch (error) {
+        console.error("Login error:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+
 
 // Get user profile
 const getUserProfile = async (req, res) => {
@@ -233,5 +292,6 @@ module.exports = {
     getUserProfile,
     verifyNFTOwnership,
     getAllUsers,
-    deleteUser
+    deleteUser,
+    loginWithEmailPassword
 };
