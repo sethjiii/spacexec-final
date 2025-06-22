@@ -7,18 +7,25 @@ const {
     getAllUsers,
     deleteUser,
     logout,
-    loginWithEmailPassword
+    loginWithEmailPassword,
+    sendRegistrationLink,
+    completeRegistration,
+    forgotPassword,
+    resetPassword
 } = require('../controllers/userController');
 const { dashboarddata } = require('../controllers/dashboardController');
 const { admindashboarddata, alluserdata, allvendordata } = require('../controllers/adminDashboardController');
 const { addComplaint, getActiveSupportTickets, findTicketBySupportId, addChatToTicket } = require('../controllers/supprtController');
 const { vendordashboarddata } = require('../controllers/vendorDashboardController');
-const { createChannelPartner, addLeadUserByChannelPartner, getChannelPartnerByUserId } = require('../controllers/channelPartnerController');
+const { createChannelPartner, addLeadUserByChannelPartner, getChannelPartnerByUserId, getAllChannelPartner, upgradeUserToChannelPartner } = require('../controllers/channelPartnerController');
 
 const userRouter = express.Router();
 
 // User Authentication Routes
-userRouter.post('/register', registerUser);  // Register a new user
+userRouter.post('/register', sendRegistrationLink);  // Register a new user
+userRouter.post('/forgotpassword', forgotPassword);  // Register a new user
+userRouter.post('/resetpassword', resetPassword);  // Register a new user
+userRouter.get('/verify-registration/:token', completeRegistration);  // Register a new user
 userRouter.post('/login', loginUser);  // User login
 userRouter.post('/loginwithemail', loginWithEmailPassword);  // User login
 userRouter.post('/logout', logout);  // User login
@@ -49,6 +56,8 @@ userRouter.post('/vendordashboard/:vendorId',vendordashboarddata);
 
 // channel partener routes
 userRouter.post('/channelpartner/create',createChannelPartner);
+userRouter.post('/getallchannelpartner',getAllChannelPartner);
+userRouter.post("/upgrade-user", upgradeUserToChannelPartner);
 userRouter.post('/channelpartner/addleads',addLeadUserByChannelPartner);
 userRouter.get('/channelpartner/getallleads/:userId',getChannelPartnerByUserId);
 module.exports = userRouter;

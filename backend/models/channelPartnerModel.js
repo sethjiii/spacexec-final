@@ -7,6 +7,10 @@ const channelPartnerSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    is_admin_approoved:{
+      type:Boolean,
+      default:false,
+    },
     user_identity:{
         type: mongoose.Schema.Types.ObjectId,
         ref: "User", // Reference to the User model who created the channel partner
