@@ -5,7 +5,8 @@ const TicketModel = require("../models/TicketsModel");
 
 const addComplaint = async (req, res) => {
     try {
-      const { subject, message,userId} = req.body;
+      const { subject, message,userId,role} = req.body;
+      console.log(req.body)
   
       // Generate a unique support ID (you can customize this logic)
       const supportId = `SUPPORT-${Date.now()}`;
@@ -14,7 +15,7 @@ const addComplaint = async (req, res) => {
         support_id: supportId,
         complainer: userId,
         subject,
-        chats:  [`customer: ${message}`]
+        chats:  [`${role}: ${message}`]
       });
   
       await ticket.save();
@@ -28,7 +29,7 @@ const addComplaint = async (req, res) => {
 
   const addChatToTicket = async (req, res) => {
     try {
-      const { ticketId, message} = req.body;
+      const { ticketId, message,role} = req.body;
   
       // Find the existing ticket by support ID (or ticketId)
       const ticket = await TicketModel.findOne({ support_id: ticketId });
@@ -38,7 +39,7 @@ const addComplaint = async (req, res) => {
       }
   
       // Append the new message to the chats array
-      ticket.chats.push(`customer: ${message}`);
+      ticket.chats.push(`${role}: ${message}`);
   
       // Save the updated ticket
       await ticket.save();
