@@ -81,6 +81,7 @@ const Hero = () => {
           <div className="mt-8 flex flex-wrap gap-4 mb-16">
             <Button
               size="lg"
+              onClick={() => window.location.href='/properties'}
               className="rounded-md hover:opacity-90 transition-opacity"
               style={{ 
                 backgroundColor: '#710014',
@@ -93,6 +94,7 @@ const Hero = () => {
             
             <Button
               size="lg"
+              onClick={() => window.location.href='/login'}
               variant="outline"
               className="rounded-md backdrop-blur-sm hover:bg-white hover:text-black transition-all"
               style={{ 

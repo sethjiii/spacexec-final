@@ -1,4 +1,3 @@
-// require('dotenv').config();
 import LazyLoad from "react-lazyload";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
@@ -98,8 +97,7 @@ const Properties = () => {
   const [error, setError] = useState<string | null>(null);
   const [sortOption, setSortOption] = useState("latest");
 
-  // Fetch properties from API (using original fetch function)
-  
+  // Fetch properties from API
   useEffect(() => {
     const fetchProperties = async () => {
       try {
@@ -108,13 +106,13 @@ const Properties = () => {
           process.env.NODE_ENV === "production"
             ? process.env.NEXT_PUBLIC_BACKEND_URL
             : "http://localhost:5000";
-        const token = localStorage.getItem("token"); // or sessionStorage/cookie depending on how you store it
+        const token = localStorage.getItem("token");
 
         const response = await fetch(`${baseUrl}/api/properties/all`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // ✅ send JWT
+            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -255,84 +253,86 @@ const Properties = () => {
   // Loading and error states
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div>Loading properties...</div>
+      <div className="min-h-screen bg-[#F2F1ED] flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block w-8 h-8 border-2 border-[#B38F6F]/30 border-t-[#710014] rounded-full animate-spin mb-4"></div>
+          <p className="text-[#B38F6F]">Loading properties...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-red-500">{error}</div>
+      <div className="min-h-screen bg-[#F2F1ED] flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-[#710014]">{error}</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen">
-      {/* <Navbar /> */}
-
+    <div className="min-h-screen bg-[#F2F1ED]">
       {/* Page header */}
-      <div className="pt-12 pb-10  bg-white">
-        <div className="container mx-auto">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Global Property Investments
+      <div className="pt-16 pb-8 md:pt-20 md:pb-12 bg-[#F2F1ED]">
+        <div className="container mx-auto px-4 md:px-6">
+          <h1 className="text-2xl md:text-3xl font-light text-[#161616] mb-2">
+            Global Property 
+            <span className="block font-medium text-[#710014]">Investments</span>
           </h1>
-          <p className="mt-2 text-gray-600">
+          <p className="text-sm md:text-base text-[#B38F6F]">
             Discover premium investment properties across international markets
           </p>
         </div>
       </div>
 
       {/* Search and filters */}
-      <div className="bg-gray-50 border-y border-gray-200">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div className="bg-white border-y border-[#B38F6F]/20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             {/* Search */}
             <div className="relative flex-grow max-w-md">
-              <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-              <Input
+              <Search className="absolute left-3 top-2.5 h-4 w-4 md:h-5 md:w-5 text-[#B38F6F]" />
+              <input
                 placeholder="Search by location or property name..."
-                className="pl-10"
+                className="w-full pl-10 pr-4 py-2 md:py-2.5 border border-[#B38F6F]/30 rounded-md focus:ring-2 focus:ring-[#710014] focus:border-[#710014] text-sm text-[#161616]"
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
               />
             </div>
 
             {/* Filter button */}
-            <Button
-              variant="outline"
+            <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 px-4 py-2 border border-[#B38F6F]/30 text-[#161616] hover:bg-[#F2F1ED] rounded-md transition-colors text-sm"
             >
               <SlidersHorizontal className="h-4 w-4" />
               Filters
-            </Button>
+            </button>
           </div>
 
           {/* Active filters */}
           {activeFilters.length > 0 && (
             <div className="mt-4 flex flex-wrap items-center gap-2">
-              <span className="text-sm text-gray-600">Active filters:</span>
+              <span className="text-sm text-[#B38F6F]">Active filters:</span>
               {activeFilters.map((filter, index) => (
-                <Badge
+                <span
                   key={index}
-                  variant="secondary"
-                  className="flex items-center gap-1"
+                  className="inline-flex items-center gap-1 px-2 py-1 bg-[#710014]/10 text-[#710014] text-xs rounded border border-[#710014]/20"
                 >
                   {filter}
                   <button
                     onClick={() => removeFilter(filter)}
-                    className="ml-1 rounded-full"
+                    className="ml-1 hover:bg-[#710014]/20 rounded-full p-0.5"
                   >
                     <X className="h-3 w-3" />
                   </button>
-                </Badge>
+                </span>
               ))}
               <button
                 onClick={clearAllFilters}
-                className="ml-2 text-sm text-primary hover:underline"
+                className="ml-2 text-sm text-[#710014] hover:underline"
               >
                 Clear all
               </button>
@@ -341,23 +341,24 @@ const Properties = () => {
 
           {/* Expanded filter panel */}
           {isFilterOpen && (
-            <div className="mt-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm animate-scale-in">
+            <div className="mt-4 rounded-lg border border-[#B38F6F]/20 bg-[#F2F1ED] p-4 md:p-6 shadow-sm">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Price range */}
                 <div>
-                  <h3 className="font-medium text-gray-900 mb-3">
+                  <h3 className="font-medium text-[#161616] mb-3 text-sm">
                     Price Range
                   </h3>
                   <div className="space-y-4">
-                    <Slider
-                      defaultValue={priceRange}
-                      min={500000}
-                      max={1500000}
-                      step={50000}
-                      value={priceRange}
-                      onValueChange={setPriceRange}
+                    <input
+                      type="range"
+                      min="500000"
+                      max="1500000"
+                      step="50000"
+                      value={priceRange[0]}
+                      onChange={(e) => setPriceRange([parseInt(e.target.value), priceRange[1]])}
+                      className="w-full h-2 bg-[#B38F6F]/20 rounded-lg appearance-none cursor-pointer"
                     />
-                    <div className="flex justify-between text-sm text-gray-600">
+                    <div className="flex justify-between text-xs text-[#B38F6F]">
                       <span>₹{(priceRange[0] / 1000).toFixed(1)}K</span>
                       <span>₹{(priceRange[1] / 1000).toFixed(1)}K</span>
                     </div>
@@ -366,19 +367,20 @@ const Properties = () => {
 
                 {/* Yield range */}
                 <div>
-                  <h3 className="font-medium text-gray-900 mb-3">
+                  <h3 className="font-medium text-[#161616] mb-3 text-sm">
                     Yield Range
                   </h3>
                   <div className="space-y-4">
-                    <Slider
-                      defaultValue={yieldRange}
-                      min={5}
-                      max={10}
-                      step={0.5}
-                      value={yieldRange}
-                      onValueChange={setYieldRange}
+                    <input
+                      type="range"
+                      min="5"
+                      max="10"
+                      step="0.5"
+                      value={yieldRange[0]}
+                      onChange={(e) => setYieldRange([parseFloat(e.target.value), yieldRange[1]])}
+                      className="w-full h-2 bg-[#B38F6F]/20 rounded-lg appearance-none cursor-pointer"
                     />
-                    <div className="flex justify-between text-sm text-gray-600">
+                    <div className="flex justify-between text-xs text-[#B38F6F]">
                       <span>{yieldRange[0]}%</span>
                       <span>{yieldRange[1]}%</span>
                     </div>
@@ -387,19 +389,23 @@ const Properties = () => {
 
                 {/* Property type */}
                 <div>
-                  <h3 className="font-medium text-gray-900 mb-3">
+                  <h3 className="font-medium text-[#161616] mb-3 text-sm">
                     Property Type
                   </h3>
                   <div className="space-y-2">
                     {["Residential", "Commercial", "Vacation Rental"].map(
                       (type) => (
                         <div key={type} className="flex items-center space-x-2">
-                          <Switch
+                          <input
+                            type="checkbox"
                             id={`filter-${type}`}
                             checked={selectedTypes.includes(type)}
-                            onCheckedChange={() => togglePropertyType(type)}
+                            onChange={() => togglePropertyType(type)}
+                            className="rounded border-[#B38F6F]/30 text-[#710014] focus:ring-[#710014]"
                           />
-                          <Label htmlFor={`filter-${type}`}>{type}</Label>
+                          <label htmlFor={`filter-${type}`} className="text-sm text-[#161616]">
+                            {type}
+                          </label>
                         </div>
                       )
                     )}
@@ -407,18 +413,19 @@ const Properties = () => {
                 </div>
               </div>
 
-              <div className="mt-4 flex justify-end">
-                <Button
-                  variant="outline"
-                  size="sm"
+              <div className="mt-6 flex justify-end gap-3">
+                <button
                   onClick={clearAllFilters}
-                  className="mr-2"
+                  className="px-4 py-2 text-sm border border-[#B38F6F]/30 text-[#161616] hover:bg-white rounded transition-colors"
                 >
                   Reset Filters
-                </Button>
-                <Button size="sm" onClick={() => setIsFilterOpen(false)}>
+                </button>
+                <button
+                  onClick={() => setIsFilterOpen(false)}
+                  className="px-4 py-2 text-sm bg-[#710014] text-[#F2F1ED] hover:bg-[#710014]/90 rounded transition-colors"
+                >
                   Apply Filters
-                </Button>
+                </button>
               </div>
             </div>
           )}
@@ -426,18 +433,17 @@ const Properties = () => {
       </div>
 
       {/* Properties grid */}
-
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="mb-6 flex justify-between items-center">
-          <p className="text-gray-600">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <p className="text-[#B38F6F] text-sm">
             Showing{" "}
-            <span className="font-medium">{filteredProperties.length}</span>{" "}
+            <span className="font-medium text-[#161616]">{filteredProperties.length}</span>{" "}
             properties
           </p>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">Sort by:</span>
+            <span className="text-sm text-[#B38F6F]">Sort by:</span>
             <select
-              className="rounded-md border-gray-300 text-sm focus:border-primary focus:ring-primary"
+              className="rounded-md border border-[#B38F6F]/30 text-sm focus:border-[#710014] focus:ring-[#710014] bg-white px-3 py-1 text-[#161616]"
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
             >
@@ -460,10 +466,10 @@ const Properties = () => {
                     offset={100}
                     once
                     placeholder={
-                      <div className="h-[300px] bg-gray-100 rounded-lg animate-pulse" />
+                      <div className="h-[300px] bg-[#B38F6F]/10 rounded-lg animate-pulse" />
                     }
                   >
-                    <PropertyCard {...property} className="custom-class" />
+                    <PropertyCard {...property} className="bg-white border border-[#B38F6F]/20 hover:border-[#710014]/30 transition-colors" />
                   </LazyLoad>
                 )
               );
@@ -471,27 +477,24 @@ const Properties = () => {
           </div>
         ) : (
           <div className="text-center py-16">
-            <div className="mx-auto mb-4 h-16 w-16 text-gray-400">
+            <div className="mx-auto mb-4 h-16 w-16 text-[#B38F6F]">
               <MapPin className="h-full w-full" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900">
+            <h3 className="text-lg font-medium text-[#161616] mb-2">
               No properties found
             </h3>
-            <p className="mt-1 text-gray-600">
+            <p className="text-[#B38F6F] mb-4">
               Try adjusting your search or filter criteria
             </p>
-            <Button
+            <button
               onClick={clearAllFilters}
-              variant="outline"
-              className="mt-4"
+              className="px-6 py-2 border border-[#B38F6F]/30 text-[#161616] hover:bg-white rounded transition-colors"
             >
               Clear filters
-            </Button>
+            </button>
           </div>
         )}
       </div>
-
-      {/* <Footer /> */}
     </div>
   );
 };

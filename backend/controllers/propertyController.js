@@ -579,8 +579,6 @@ const getAllMarketPlace = async (req, res) => {
       },
     });
   
-
-  
     res.status(200).json({
       message: "Listings fetched successfully",
       count: listings.length,
