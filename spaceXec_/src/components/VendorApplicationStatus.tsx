@@ -29,7 +29,7 @@ const VendorApplicationStatus = ({ userId }: { userId: string }) => {
 
   const checkVendorStatus = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/vendors/user/${userId}`);
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/vendors/user/${userId}`);
       setVendorStatus(response.data);
     } catch (error: any) {
       if (error.response?.status === 404) {

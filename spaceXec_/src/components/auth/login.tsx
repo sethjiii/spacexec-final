@@ -28,14 +28,14 @@ export default function Login() {
     e.preventDefault();
     setError("");
     setLoading(true);
-  
-    const baseUrl =
-    process.env.NODE_ENV === "production"
-      ? process.env.REACT_APP_BACKEND_URL
-      : "http://localhost:5000";
 
-  try {
-    const res = await fetch(`${baseUrl}/api/users/loginwithemail`, {
+    const baseUrl =
+      import.meta.env.MODE === "production"
+        ? import.meta.env.VITE_BACKEND_URL
+        : "http://localhost:5000";
+
+    try {
+      const res = await fetch(`${baseUrl}/api/users/loginwithemail`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -43,13 +43,13 @@ export default function Login() {
         body: JSON.stringify({ email, password }),
         credentials: "include", // important if you're using cookies for auth
       });
-  
+
       const data = await res.json();
-  
+
       if (!res.ok) {
         throw new Error(data.error || "Login failed.");
       }
-  
+
       // Optionally store token or user data in state/localStorage here
       console.log("Logged in user:", data);
       console.log(data);
@@ -79,8 +79,8 @@ export default function Login() {
           window.location.reload();
           break;
       }
-      
-  
+
+
       // Redirect or update UI as needed
     } catch (err) {
       setError(err.message || "Something went wrong.");
@@ -88,7 +88,7 @@ export default function Login() {
       setLoading(false);
     }
   };
-  
+
 
   // 🔹 Handle Google Login
   const signInWithGoogle = async () => {
@@ -120,8 +120,8 @@ export default function Login() {
   // 🔹 Send User Data to Backend & Handle Response
   const sendUserDataToBackend = async (token, userData) => {
     const baseUrl =
-      process.env.NODE_ENV === "production"
-        ? process.env.REACT_APP_BACKEND_URL
+      import.meta.env.MODE === "production"
+        ? import.meta.env.VITE_BACKEND_URL
         : "http://localhost:5000";
 
     try {
@@ -167,7 +167,7 @@ export default function Login() {
           window.location.reload();
           break;
       }
-      
+
     } catch (err) {
       setError(err.message);
     }

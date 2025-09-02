@@ -3,8 +3,8 @@ export const useLogout = () => {
   const handleLogout = async () => {
     try {
       const baseUrl =
-        process.env.NODE_ENV === "production"
-          ? process.env.NEXT_PUBLIC_BACKEND_URL // use NEXT_PUBLIC_ for frontend env
+        import.meta.env.MODE === "production"
+          ? import.meta.env.VITE_BACKEND_URL
           : "http://localhost:5000";
 
       const response = await fetch(`${baseUrl}/api/users/logout`, {

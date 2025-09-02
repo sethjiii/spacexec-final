@@ -33,10 +33,10 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
   const sortedNotifications = notifications.sort((a, b) => {
     return a.read === b.read
       ? new Date(b.notification.created_at).getTime() -
-          new Date(a.notification.created_at).getTime()
+      new Date(a.notification.created_at).getTime()
       : a.read
-      ? 1
-      : -1;
+        ? 1
+        : -1;
   });
 
   const unreadNotifications = sortedNotifications.filter(
@@ -191,7 +191,7 @@ const Navbar: React.FC = () => {
 
         try {
           const response = await fetch(
-            `http://localhost:5000/api/users/notifications/${storedId}`
+            `${import.meta.env.VITE_BACKEND_URL}/api/users/notifications/${storedId}`
           );
           if (!response.ok) throw new Error("Failed to fetch notifications");
 
@@ -211,8 +211,8 @@ const Navbar: React.FC = () => {
   const handleLogout = async () => {
     try {
       const baseUrl =
-        process.env.NODE_ENV === "production"
-          ? process.env.NEXT_PUBLIC_BACKEND_URL
+        import.meta.env.MODE === "production"
+          ? import.meta.env.VITE_BACKEND_URL
           : "http://localhost:5000";
 
       const token = localStorage.getItem("token"); // JWT stored after login
@@ -244,10 +244,9 @@ const Navbar: React.FC = () => {
   const renderMobileMenu = () => (
     <div
       className={`fixed inset-0 z-40 transform transition-all duration-300 ease-in-out 
-        ${
-          isMobileMenuOpen
-            ? "translate-x-0 opacity-100"
-            : "-translate-x-full opacity-0"
+        ${isMobileMenuOpen
+          ? "translate-x-0 opacity-100"
+          : "-translate-x-full opacity-0"
         }`}
       style={{ backgroundColor: "#161616" }}
     >
@@ -316,11 +315,10 @@ const Navbar: React.FC = () => {
   // Render profile dropdown
   const renderProfileMenu = () => (
     <div
-      className={`absolute z-50 right-0 top-full w-72 bg-white shadow-2xl rounded-2xl mt-3 overflow-hidden border transition-all duration-200 ${
-        isProfileMenuOpen
+      className={`absolute z-50 right-0 top-full w-72 bg-white shadow-2xl rounded-2xl mt-3 overflow-hidden border transition-all duration-200 ${isProfileMenuOpen
           ? "opacity-100 visible transform translate-y-0"
           : "opacity-0 invisible transform -translate-y-2"
-      }`}
+        }`}
       style={{ borderColor: "#F2F1ED" }}
     >
       <div
@@ -347,21 +345,21 @@ const Navbar: React.FC = () => {
           { to: `/dashboard/${userId}`, icon: FaUser, label: "Dashboard" },
           ...(userRole !== "user"
             ? [
-                {
-                  to: `/channelpartner/${userId}`,
-                  icon: FaUser,
-                  label: "Channel Partner Dashboard",
-                },
-              ]
+              {
+                to: `/channelpartner/${userId}`,
+                icon: FaUser,
+                label: "Channel Partner Dashboard",
+              },
+            ]
             : []),
           ...(userRole === "vendor"
             ? [
-                {
-                  to: `/vendordashboard`,
-                  icon: FaUser,
-                  label: "Vendor Dashboard",
-                },
-              ]
+              {
+                to: `/vendordashboard`,
+                icon: FaUser,
+                label: "Vendor Dashboard",
+              },
+            ]
             : []),
           { to: "/settings", icon: FaCog, label: "Settings" },
         ].map(({ to, icon: Icon, label }) => (
@@ -393,11 +391,10 @@ const Navbar: React.FC = () => {
   // Render more dropdown
   const renderMoreNav = () => (
     <div
-      className={`absolute z-50 right-0 top-full w-64 bg-white shadow-2xl rounded-2xl mt-3 overflow-hidden border transition-all duration-200 ${
-        isMoreMenuOpen
+      className={`absolute z-50 right-0 top-full w-64 bg-white shadow-2xl rounded-2xl mt-3 overflow-hidden border transition-all duration-200 ${isMoreMenuOpen
           ? "opacity-100 visible transform translate-y-0"
           : "opacity-0 invisible transform -translate-y-2"
-      }`}
+        }`}
       style={{ borderColor: "#F2F1ED" }}
     >
       <div className="py-2">
@@ -470,9 +467,8 @@ const Navbar: React.FC = () => {
               >
                 More
                 <FaChevronDown
-                  className={`ml-2 w-3 h-3 transition-transform duration-200 ${
-                    isMoreMenuOpen ? "rotate-180" : ""
-                  }`}
+                  className={`ml-2 w-3 h-3 transition-transform duration-200 ${isMoreMenuOpen ? "rotate-180" : ""
+                    }`}
                 />
                 <span
                   className="absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-200 group-hover:w-full"
@@ -560,9 +556,8 @@ const Navbar: React.FC = () => {
                       style={{ borderColor: "#710014" }}
                     />
                     <FaChevronDown
-                      className={`w-3 h-3 transition-transform duration-200 ${
-                        isProfileMenuOpen ? "rotate-180" : ""
-                      }`}
+                      className={`w-3 h-3 transition-transform duration-200 ${isProfileMenuOpen ? "rotate-180" : ""
+                        }`}
                       style={{ color: "#161616" }}
                     />
                   </button>

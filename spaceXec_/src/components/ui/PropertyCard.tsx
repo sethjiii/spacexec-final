@@ -59,8 +59,8 @@ const PropertyCard = ({
 
       const isAdding = !isFavorite; // Determine action
       const baseUrl =
-        process.env.NODE_ENV === "production"
-          ? process.env.NEXT_PUBLIC_BACKEND_URL
+        import.meta.env.MODE === "production"
+          ? import.meta.env.VITE_BACKEND_URL
           : "http://localhost:5000";
 
       const token = localStorage.getItem("token"); // JWT from login
@@ -151,9 +151,8 @@ const PropertyCard = ({
           <div className="absolute bottom-3 left-3">
             <Badge
               variant="secondary"
-              className={`text-xs font-medium ${
-                status === "active" ? "bg-green-500 text-white" : "bg-gray-400"
-              }`}
+              className={`text-xs font-medium ${status === "active" ? "bg-green-500 text-white" : "bg-gray-400"
+                }`}
             >
               {status.toUpperCase()}
             </Badge>

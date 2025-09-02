@@ -19,8 +19,8 @@ const InvestPage = () => {
     const fetchPropertyData = async () => {
       try {
         const baseUrl =
-          process.env.NODE_ENV === "production"
-            ? process.env.REACT_APP_BACKEND_URL
+          import.meta.env.MODE === "production"
+            ? import.meta.env.VITE_BACKEND_URL
             : "http://localhost:5000";
 
         const token = localStorage.getItem("token"); // JWT stored after login

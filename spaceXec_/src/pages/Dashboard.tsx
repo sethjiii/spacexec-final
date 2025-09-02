@@ -299,8 +299,8 @@ const Dashboard = () => {
         }
 
         const baseUrl =
-          process.env.NODE_ENV === "production"
-            ? process.env.NEXT_PUBLIC_BACKEND_URL
+          import.meta.env.MODE === "production"
+            ? import.meta.env.VITE_BACKEND_URL
             : "http://localhost:5000";
 
         const token = localStorage.getItem("token"); // or however you store the JWT
@@ -368,11 +368,10 @@ const Dashboard = () => {
                   <li>
                     <button
                       onClick={() => setActiveTab("overview")}
-                      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md transition-colors ${
-                        activeTab === "overview"
+                      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md transition-colors ${activeTab === "overview"
                           ? "bg-primary/10 text-primary font-medium"
                           : "text-gray-700 hover:bg-gray-100"
-                      }`}
+                        }`}
                     >
                       <Home className="h-5 w-5" />
                       <span>Overview</span>
@@ -381,11 +380,10 @@ const Dashboard = () => {
                   <li>
                     <button
                       onClick={() => setActiveTab("my-properties")}
-                      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md transition-colors ${
-                        activeTab === "my-properties"
+                      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md transition-colors ${activeTab === "my-properties"
                           ? "bg-primary/10 text-primary font-medium"
                           : "text-gray-700 hover:bg-gray-100"
-                      }`}
+                        }`}
                     >
                       <Home className="h-5 w-5" />
                       <span>My Properties</span>
@@ -395,11 +393,10 @@ const Dashboard = () => {
                   <li>
                     <button
                       onClick={() => setActiveTab("wishlist")}
-                      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md transition-colors ${
-                        activeTab === "wishlist"
+                      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md transition-colors ${activeTab === "wishlist"
                           ? "bg-primary/10 text-primary font-medium"
                           : "text-gray-700 hover:bg-gray-100"
-                      }`}
+                        }`}
                     >
                       <Heart className="h-5 w-5" />
                       <span>Wishlist</span>
@@ -411,11 +408,10 @@ const Dashboard = () => {
                   <li>
                     <button
                       onClick={() => setActiveTab("transactions")}
-                      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md transition-colors ${
-                        activeTab === "transactions"
+                      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md transition-colors ${activeTab === "transactions"
                           ? "bg-primary/10 text-primary font-medium"
                           : "text-gray-700 hover:bg-gray-100"
-                      }`}
+                        }`}
                     >
                       <DollarSign className="h-5 w-5" />
                       <span>Transactions</span>
@@ -424,30 +420,28 @@ const Dashboard = () => {
                   <li>
                     <button
                       onClick={() => setActiveTab("notifications")}
-                      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md transition-colors ${
-                        activeTab === "notifications"
+                      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md transition-colors ${activeTab === "notifications"
                           ? "bg-primary/10 text-primary font-medium"
                           : "text-gray-700 hover:bg-gray-100"
-                      }`}
+                        }`}
                     >
                       <Bell className="h-5 w-5" />
                       <span>Notifications</span>
                       {userData.notifications.filter((n) => !n.read).length >
                         0 && (
-                        <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-white">
-                          {userData.notifications.filter((n) => !n.read).length}
-                        </span>
-                      )}
+                          <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-white">
+                            {userData.notifications.filter((n) => !n.read).length}
+                          </span>
+                        )}
                     </button>
                   </li>
                   <li>
                     <button
                       onClick={() => setActiveTab("profile")}
-                      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md transition-colors ${
-                        activeTab === "profile"
+                      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md transition-colors ${activeTab === "profile"
                           ? "bg-primary/10 text-primary font-medium"
                           : "text-gray-700 hover:bg-gray-100"
-                      }`}
+                        }`}
                     >
                       <User className="h-5 w-5" />
                       <span>Profile</span>
@@ -456,11 +450,10 @@ const Dashboard = () => {
                   <li>
                     <button
                       onClick={() => setActiveTab("support")}
-                      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md transition-colors ${
-                        activeTab === "support"
+                      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md transition-colors ${activeTab === "support"
                           ? "bg-primary/10 text-primary font-medium"
                           : "text-gray-700 hover:bg-gray-100"
-                      }`}
+                        }`}
                     >
                       <FileText className="h-5 w-5" />
                       <span>Support</span>
@@ -752,11 +745,10 @@ const Dashboard = () => {
                             >
                               <div className="flex items-start space-x-3">
                                 <div
-                                  className={`mt-1 h-8 w-8 rounded-full flex items-center justify-center ${
-                                    transaction.type === "investment"
+                                  className={`mt-1 h-8 w-8 rounded-full flex items-center justify-center ${transaction.type === "investment"
                                       ? "bg-blue-100"
                                       : "bg-green-100"
-                                  }`}
+                                    }`}
                                 >
                                   {transaction.type === "investment" ? (
                                     <TrendingUp className="h-4 w-4 text-blue-600" />
@@ -766,11 +758,10 @@ const Dashboard = () => {
                                 </div>
                                 <div>
                                   <p
-                                    className={`font-medium ${
-                                      transaction.type === "investment"
+                                    className={`font-medium ${transaction.type === "investment"
                                         ? "text-green-600"
                                         : "text-gray-900"
-                                    }`}
+                                      }`}
                                   >
                                     {transaction.type === "investment"
                                       ? "Invested in"
@@ -793,11 +784,10 @@ const Dashboard = () => {
                                 </div>
                               </div>
                               <p
-                                className={`font-medium ${
-                                  transaction.type === "investment"
+                                className={`font-medium ${transaction.type === "investment"
                                     ? "text-gray-600"
                                     : "text-gray-900"
-                                }`}
+                                  }`}
                               >
                                 {transaction.type === "investment" ? "-" : "+"}{" "}
                                 ₹{transaction.amount.toLocaleString()}{" "}
@@ -1195,11 +1185,10 @@ const Dashboard = () => {
                         >
                           <div className="flex items-start space-x-3">
                             <div
-                              className={`mt-1 h-10 w-10 rounded-full flex items-center justify-center ${
-                                transaction.type === "investment"
+                              className={`mt-1 h-10 w-10 rounded-full flex items-center justify-center ${transaction.type === "investment"
                                   ? "bg-blue-100"
                                   : "bg-green-100"
-                              }`}
+                                }`}
                             >
                               {transaction.type === "investment" ? (
                                 <TrendingUp
@@ -1224,11 +1213,10 @@ const Dashboard = () => {
                             </div>
                           </div>
                           <div
-                            className={`text-lg font-medium ${
-                              transaction.type === "investment"
+                            className={`text-lg font-medium ${transaction.type === "investment"
                                 ? "text-gray-900"
                                 : "text-green-600"
-                            }`}
+                              }`}
                           >
                             {transaction.type === "investment" ? "-" : "+"} ₹
                             {transaction.amount.toLocaleString()}
@@ -1253,31 +1241,27 @@ const Dashboard = () => {
                       {userData.notifications.map((notification) => (
                         <div
                           key={notification.id}
-                          className={`p-4 flex ${
-                            !notification.read ? "bg-blue-50" : ""
-                          }`}
+                          className={`p-4 flex ${!notification.read ? "bg-blue-50" : ""
+                            }`}
                         >
                           <div
-                            className={`mt-1 h-10 w-10 rounded-full flex items-center justify-center ${
-                              !notification.read ? "bg-blue-100" : "bg-gray-100"
-                            }`}
+                            className={`mt-1 h-10 w-10 rounded-full flex items-center justify-center ${!notification.read ? "bg-blue-100" : "bg-gray-100"
+                              }`}
                           >
                             <Bell
-                              className={`h-5 w-5 ${
-                                !notification.read
+                              className={`h-5 w-5 ${!notification.read
                                   ? "text-blue-600"
                                   : "text-gray-600"
-                              }`}
+                                }`}
                             />
                           </div>
                           <div className="ml-4 flex-1">
                             <div className="flex justify-between">
                               <p
-                                className={`font-medium ${
-                                  !notification.read
+                                className={`font-medium ${!notification.read
                                     ? "text-blue-900"
                                     : "text-gray-900"
-                                }`}
+                                  }`}
                               >
                                 {notification.message}
                               </p>

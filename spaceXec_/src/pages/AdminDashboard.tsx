@@ -396,8 +396,8 @@ const AdminDashboard = () => {
     try {
       const token = getAuthToken(); // Your helper to get the JWT
       const baseUrl =
-        process.env.NODE_ENV === "production"
-          ? process.env.NEXT_PUBLIC_BACKEND_URL
+        import.meta.env.MODE === "production"
+          ? import.meta.env.VITE_BACKEND_URL
           : "http://localhost:5000";
 
       const res = await fetch(
@@ -438,8 +438,8 @@ const AdminDashboard = () => {
     try {
       const token = getAuthToken();
       const baseUrl =
-        process.env.NODE_ENV === "production"
-          ? process.env.NEXT_PUBLIC_BACKEND_URL
+        import.meta.env.MODE === "production"
+          ? import.meta.env.VITE_BACKEND_URL
           : "http://localhost:5000";
 
       const res = await fetch(
@@ -479,8 +479,8 @@ const AdminDashboard = () => {
     try {
       const token = getAuthToken();
       const baseUrl =
-        process.env.NODE_ENV === "production"
-          ? process.env.NEXT_PUBLIC_BACKEND_URL
+        import.meta.env.MODE === "production"
+          ? import.meta.env.VITE_BACKEND_URL
           : "http://localhost:5000";
 
       const res = await fetch(
@@ -518,8 +518,8 @@ const AdminDashboard = () => {
         }
 
         const baseUrl =
-          process.env.NODE_ENV === "production"
-            ? process.env.NEXT_PUBLIC_BACKEND_URL
+          import.meta.env.MODE === "production"
+            ? import.meta.env.VITE_BACKEND_URL
             : "http://localhost:5000";
 
         const token = localStorage.getItem("token"); // JWT stored after login
@@ -568,8 +568,8 @@ const AdminDashboard = () => {
   const fetchUsersData = async () => {
     try {
       const baseUrl =
-        process.env.NODE_ENV === "production"
-          ? process.env.NEXT_PUBLIC_BACKEND_URL
+        import.meta.env.MODE === "production"
+          ? import.meta.env.VITE_BACKEND_URL
           : "http://localhost:5000";
 
       const token = localStorage.getItem("token"); // JWT stored after login
@@ -602,8 +602,8 @@ const AdminDashboard = () => {
   const fetchAllProperties = async () => {
     try {
       const baseUrl =
-        process.env.NODE_ENV === "production"
-          ? process.env.NEXT_PUBLIC_BACKEND_URL
+        import.meta.env.MODE === "production"
+          ? import.meta.env.VITE_BACKEND_URL
           : "http://localhost:5000";
 
       const token = localStorage.getItem("token"); // JWT stored after login
@@ -634,8 +634,8 @@ const AdminDashboard = () => {
   const channelPartnerFilterFromUser = async () => {
     try {
       const baseUrl =
-        process.env.NODE_ENV === "production"
-          ? process.env.NEXT_PUBLIC_BACKEND_URL
+        import.meta.env.MODE === "production"
+          ? import.meta.env.VITE_BACKEND_URL
           : "http://localhost:5000";
 
       const token = localStorage.getItem("token"); // JWT stored after login
@@ -671,22 +671,22 @@ const AdminDashboard = () => {
   const upgradeUserToChannelPartner = async (userId) => {
     try {
       const baseUrl =
-  process.env.NODE_ENV === "production"
-    ? process.env.NEXT_PUBLIC_BACKEND_URL
-    : "http://localhost:5000";
+        import.meta.env.MODE === "production"
+          ? import.meta.env.VITE_BACKEND_URL
+          : "http://localhost:5000";
 
-const token = localStorage.getItem("token"); // JWT stored after login
+      const token = localStorage.getItem("token"); // JWT stored after login
 
-const response = await fetch(`${baseUrl}/api/users/upgrade-user`, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    "Authorization": `Bearer ${token}`, // ✅ attach JWT
-  },
-  body: JSON.stringify({ userId }),
-});
+      const response = await fetch(`${baseUrl}/api/users/upgrade-user`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`, // ✅ attach JWT
+        },
+        body: JSON.stringify({ userId }),
+      });
 
-const data = await response.json();
+      const data = await response.json();
 
 
 
@@ -753,8 +753,8 @@ const data = await response.json();
     channelPartnerFilter === "all"
       ? channelPartnerList
       : channelPartnerList.filter(
-          (partner) => partner.status === channelPartnerFilter
-        );
+        (partner) => partner.status === channelPartnerFilter
+      );
 
   return (
     <div className="flex min-h-screen bg-gray-100">

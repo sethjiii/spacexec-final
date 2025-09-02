@@ -484,8 +484,8 @@ const ChannelPartner = () => {
     const fetchleads = async () => {
       try {
         const baseUrl =
-          process.env.NODE_ENV === "production"
-            ? process.env.NEXT_PUBLIC_BACKEND_URL
+          import.meta.env.MODE === "production"
+            ? import.meta.env.VITE_BACKEND_URL
             : "http://localhost:5000";
 
         const userId = localStorage.getItem("_id");
@@ -540,8 +540,8 @@ const ChannelPartner = () => {
       };
 
       const baseUrl =
-        process.env.NODE_ENV === "production"
-          ? process.env.NEXT_PUBLIC_BACKEND_URL
+        import.meta.env.MODE === "production"
+          ? import.meta.env.VITE_BACKEND_URL
           : "http://localhost:5000";
 
       const res = await fetch(`${baseUrl}/api/users/channelpartner/addleads`, {
@@ -574,8 +574,8 @@ const ChannelPartner = () => {
   const vendorFilterFromUser = async () => {
     try {
       const baseUrl =
-        process.env.NODE_ENV === "production"
-          ? process.env.NEXT_PUBLIC_BACKEND_URL
+        import.meta.env.MODE === "production"
+          ? import.meta.env.VITE_BACKEND_URL
           : "http://localhost:5000";
 
       const response = await fetch(
@@ -698,11 +698,13 @@ const ChannelPartner = () => {
             <div className="flex justify-between items-center">
               <h1 className="text-2xl font-bold">Channel Partner Dashboard</h1>
               <div className="flex items-center space-x-4">
-                <Input
-                  placeholder="Search..."
-                  className="max-w-xs"
-                  icon={<Search className="h-4 w-4" />}
-                />
+                <div className="relative max-w-xs flex items-center">
+                  <Search className="absolute left-3 h-4 w-4 text-gray-400 pointer-events-none" />
+                  <Input
+                    placeholder="Search..."
+                    className="pl-9"
+                  />
+                </div>
                 <Button>
                   <Search className="h-4 w-4 mr-2" />
                   Search
@@ -1014,22 +1016,21 @@ const ChannelPartner = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {leads.map((lead,index) => (
+                      {leads.map((lead, index) => (
                         <tr
                           key={lead.id}
                           className="bg-white border-b hover:bg-gray-50"
                         >
-                          <td className="px-6 py-4 font-medium">{index+1}</td>
+                          <td className="px-6 py-4 font-medium">{index + 1}</td>
                           <td className="px-6 py-4">{lead.name}</td>
                           <td className="px-6 py-4">{lead.mobile}</td>
                           <td className="px-6 py-4">{lead.email}</td>
                           <td className="px-6 py-4">
                             <span
-                              className={`px-2 py-1 rounded-full text-xs ${
-                                lead.status === "active"
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-yellow-100 text-yellow-800"
-                              }`}
+                              className={`px-2 py-1 rounded-full text-xs ${lead.status === "active"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-yellow-100 text-yellow-800"
+                                }`}
                             >
                               {lead.status.charAt(0).toUpperCase() +
                                 lead.status.slice(1)}

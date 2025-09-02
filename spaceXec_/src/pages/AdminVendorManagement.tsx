@@ -84,7 +84,7 @@ const AdminVendorManagement = () => {
 
   const fetchVendors = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/vendors/admin/applications", {
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/vendors/admin/applications`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`, // add your Firebase/JWT token
         },
@@ -101,7 +101,7 @@ const AdminVendorManagement = () => {
 
   const handleApprove = async (vendorId: string) => {
     try {
-      await axios.post(`http://localhost:5000/api/vendors/admin/approve/${vendorId}`, {
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/vendors/admin/approve/${vendorId}`, {
         adminId,
         notes: "Approved by admin",
       });
@@ -114,7 +114,7 @@ const AdminVendorManagement = () => {
 
   const handleReject = async (vendorId: string) => {
     try {
-      await axios.post(`http://localhost:5000/api/vendors/admin/reject/${vendorId}`, {
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/vendors/admin/reject/${vendorId}`, {
         adminId,
         reason: "Rejected by admin",
         notes: "Application rejected",

@@ -41,9 +41,9 @@ interface PropertyFormData {
   riskFactors: string[]; // Array of potential risks
   return: {
     rental: number,
-    appreciation:number,
+    appreciation: number,
     total: number,
-}, 
+  },
   financials: {
     propertyPrice: number; // Price of the property
     stampDuty: number; // Stamp duty fees
@@ -101,7 +101,7 @@ const AdminPropertyForm: React.FC = () => {
     riskFactors: [""], // Default empty string array for risk factors
     return: {
       rental: 0,
-      appreciation:0,
+      appreciation: 0,
       total: 0,// Including historical return as 0 initially
     },
     financials: {
@@ -120,7 +120,7 @@ const AdminPropertyForm: React.FC = () => {
       distributionFrequency: "monthly", // Default to 'monthly'
     },
   };
-  
+
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [formData, setFormData] = useState<PropertyFormData>(initialFormState);
   const [loading, setLoading] = useState<boolean>(false);
@@ -199,8 +199,8 @@ const AdminPropertyForm: React.FC = () => {
 
     try {
       const baseUrl =
-        process.env.NODE_ENV === "production"
-          ? process.env.NEXT_PUBLIC_BACKEND_URL
+        import.meta.env.MODE === "production"
+          ? import.meta.env.VITE_BACKEND_URL
           : "http://localhost:5000";
 
       const res = await fetch(`${baseUrl}/api/properties/uploadimages`, {
@@ -226,34 +226,34 @@ const AdminPropertyForm: React.FC = () => {
   const handleDocumentUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const formData = new FormData();
-  
+
       // Append files to FormData
       Array.from(e.target.files).forEach((file) => {
         formData.append("documents", file); // 'documents' should match the backend field
       });
-  
+
       try {
         // Determine the base URL for the backend
         const baseUrl =
-          process.env.NODE_ENV === "production"
-            ? process.env.NEXT_PUBLIC_BACKEND_URL
+          import.meta.env.MODE === "production"
+            ? import.meta.env.VITE_BACKEND_URL
             : "http://localhost:5000";
-  
+
         // Make the POST request to upload the documents
         const response = await fetch(`${baseUrl}/api/properties/uploadpdfs`, {
           method: "POST",
           body: formData,
         });
-  
+
         // Check if the response is OK
         if (!response.ok) {
           throw new Error("Failed to upload documents");
         }
-  
+
         // Parse the JSON response
         const data = await response.json();
         // console.log(data)
-  
+
         // Update the formData state with the document URLs
         setFormData((prev) => ({
           ...prev,
@@ -265,7 +265,7 @@ const AdminPropertyForm: React.FC = () => {
       }
     }
   };
-  
+
 
   // Add amenity
   const handleAddAmenity = () => {
@@ -326,17 +326,17 @@ const AdminPropertyForm: React.FC = () => {
   const calculateDerivedFields = () => {
     // Calculate price per share
     const pricePerShare = formData.financials.propertyPrice / formData.totalShares;
-  
+
     // Calculate net operating income based on rental yield and property price
     const netOperatingIncome =
       (formData.financials.expectedRentalYield / 100) * formData.financials.propertyPrice;
-  
+
     // Calculate cap rate
     const capRate =
       formData.financials.propertyPrice > 0
         ? (netOperatingIncome / formData.financials.propertyPrice) * 100
         : 0;
-  
+
     // Update the formData state with calculated fields
     setFormData((prev) => ({
       ...prev,
@@ -348,7 +348,7 @@ const AdminPropertyForm: React.FC = () => {
       },
     }));
   };
-  
+
 
   // Handle form submission
 
@@ -365,14 +365,14 @@ const AdminPropertyForm: React.FC = () => {
         return;
       }
 
-     
+
 
       const baseUrl =
-      process.env.NODE_ENV === "production"
-        ? process.env.NEXT_PUBLIC_BACKEND_URL
-        : "http://localhost:5000";
+        import.meta.env.MODE === "production"
+          ? import.meta.env.VITE_BACKEND_URL
+          : "http://localhost:5000";
 
-     
+
 
       const submitRes = await fetch(`${baseUrl}/api/properties/addbyadmin`, {
         method: "POST",
@@ -380,7 +380,7 @@ const AdminPropertyForm: React.FC = () => {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body:JSON.stringify(formData),
+        body: JSON.stringify(formData),
       });
 
       const submitData = await submitRes.json();
@@ -409,51 +409,46 @@ const AdminPropertyForm: React.FC = () => {
       {/* Form tabs */}
       <div className="flex mb-6 border-b">
         <button
-          className={`px-4 py-2 ${
-            activeTab === "basic"
-              ? "border-b-2 border-blue-500 font-medium"
-              : ""
-          }`}
+          className={`px-4 py-2 ${activeTab === "basic"
+            ? "border-b-2 border-blue-500 font-medium"
+            : ""
+            }`}
           onClick={() => handleTabChange("basic")}
         >
           Basic Info
         </button>
         <button
-          className={`px-4 py-2 ${
-            activeTab === "media"
-              ? "border-b-2 border-blue-500 font-medium"
-              : ""
-          }`}
+          className={`px-4 py-2 ${activeTab === "media"
+            ? "border-b-2 border-blue-500 font-medium"
+            : ""
+            }`}
           onClick={() => handleTabChange("media")}
         >
           Media
         </button>
         <button
-          className={`px-4 py-2 ${
-            activeTab === "features"
-              ? "border-b-2 border-blue-500 font-medium"
-              : ""
-          }`}
+          className={`px-4 py-2 ${activeTab === "features"
+            ? "border-b-2 border-blue-500 font-medium"
+            : ""
+            }`}
           onClick={() => handleTabChange("features")}
         >
           Features & Amenities
         </button>
         <button
-          className={`px-4 py-2 ${
-            activeTab === "financial"
-              ? "border-b-2 border-blue-500 font-medium"
-              : ""
-          }`}
+          className={`px-4 py-2 ${activeTab === "financial"
+            ? "border-b-2 border-blue-500 font-medium"
+            : ""
+            }`}
           onClick={() => handleTabChange("financial")}
         >
           Financial Details
         </button>
         <button
-          className={`px-4 py-2 ${
-            activeTab === "legal"
-              ? "border-b-2 border-blue-500 font-medium"
-              : ""
-          }`}
+          className={`px-4 py-2 ${activeTab === "legal"
+            ? "border-b-2 border-blue-500 font-medium"
+            : ""
+            }`}
           onClick={() => handleTabChange("legal")}
         >
           Legal & Risk
@@ -901,7 +896,7 @@ const AdminPropertyForm: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                  Total Return (%)
+                    Total Return (%)
                   </label>
                   <input
                     type="number"
@@ -916,7 +911,7 @@ const AdminPropertyForm: React.FC = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                  Appreciation Return (%) (optional)
+                    Appreciation Return (%) (optional)
                   </label>
                   <input
                     type="number"
@@ -931,7 +926,7 @@ const AdminPropertyForm: React.FC = () => {
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                  Rental Return (%) (optional)
+                    Rental Return (%) (optional)
                   </label>
                   <input
                     type="number"
@@ -947,150 +942,150 @@ const AdminPropertyForm: React.FC = () => {
             </div>
 
             <div>
-  <h3 className="text-lg font-medium mb-2">Financial Details</h3>
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-    {/* Property Price */}
-    <div>
-      <label className="block text-sm font-medium mb-1">Property Price ($)</label>
-      <input
-        type="number"
-        name="financials.propertyPrice"
-        value={formData.financials.propertyPrice}
-        onChange={handleNumberChange}
-        onBlur={calculateDerivedFields}
-        className="w-full p-2 border rounded"
-        min="0"
-        required
-      />
-    </div>
+              <h3 className="text-lg font-medium mb-2">Financial Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Property Price */}
+                <div>
+                  <label className="block text-sm font-medium mb-1">Property Price ($)</label>
+                  <input
+                    type="number"
+                    name="financials.propertyPrice"
+                    value={formData.financials.propertyPrice}
+                    onChange={handleNumberChange}
+                    onBlur={calculateDerivedFields}
+                    className="w-full p-2 border rounded"
+                    min="0"
+                    required
+                  />
+                </div>
 
-    {/* Stamp Duty */}
-    <div>
-      <label className="block text-sm font-medium mb-1">Stamp Duty ($)</label>
-      <input
-        type="number"
-        name="financials.stampDuty"
-        value={formData.financials.stampDuty}
-        onChange={handleNumberChange}
-        className="w-full p-2 border rounded"
-        min="0"
-        required
-      />
-    </div>
+                {/* Stamp Duty */}
+                <div>
+                  <label className="block text-sm font-medium mb-1">Stamp Duty ($)</label>
+                  <input
+                    type="number"
+                    name="financials.stampDuty"
+                    value={formData.financials.stampDuty}
+                    onChange={handleNumberChange}
+                    className="w-full p-2 border rounded"
+                    min="0"
+                    required
+                  />
+                </div>
 
-    {/* Registration Fee */}
-    <div>
-      <label className="block text-sm font-medium mb-1">Registration Fee ($)</label>
-      <input
-        type="number"
-        name="financials.registrationFee"
-        value={formData.financials.registrationFee}
-        onChange={handleNumberChange}
-        className="w-full p-2 border rounded"
-        min="0"
-        required
-      />
-    </div>
+                {/* Registration Fee */}
+                <div>
+                  <label className="block text-sm font-medium mb-1">Registration Fee ($)</label>
+                  <input
+                    type="number"
+                    name="financials.registrationFee"
+                    value={formData.financials.registrationFee}
+                    onChange={handleNumberChange}
+                    className="w-full p-2 border rounded"
+                    min="0"
+                    required
+                  />
+                </div>
 
-    {/* Legal Fee */}
-    <div>
-      <label className="block text-sm font-medium mb-1">Legal Fee ($)</label>
-      <input
-        type="number"
-        name="financials.legalFee"
-        value={formData.financials.legalFee}
-        onChange={handleNumberChange}
-        className="w-full p-2 border rounded"
-        min="0"
-        required
-      />
-    </div>
+                {/* Legal Fee */}
+                <div>
+                  <label className="block text-sm font-medium mb-1">Legal Fee ($)</label>
+                  <input
+                    type="number"
+                    name="financials.legalFee"
+                    value={formData.financials.legalFee}
+                    onChange={handleNumberChange}
+                    className="w-full p-2 border rounded"
+                    min="0"
+                    required
+                  />
+                </div>
 
-    {/* Total Investment */}
-    <div>
-      <label className="block text-sm font-medium mb-1">Total Investment ($)</label>
-      <input
-        type="number"
-        name="financials.totalInvestment"
-        value={formData.financials.totalInvestment}
-        onChange={handleNumberChange}
-        onBlur={calculateDerivedFields}
-        className="w-full p-2 border rounded"
-        min="0"
-        required
-      />
-    </div>
+                {/* Total Investment */}
+                <div>
+                  <label className="block text-sm font-medium mb-1">Total Investment ($)</label>
+                  <input
+                    type="number"
+                    name="financials.totalInvestment"
+                    value={formData.financials.totalInvestment}
+                    onChange={handleNumberChange}
+                    onBlur={calculateDerivedFields}
+                    className="w-full p-2 border rounded"
+                    min="0"
+                    required
+                  />
+                </div>
 
-    {/* Expected Rental Yield */}
-    <div>
-      <label className="block text-sm font-medium mb-1">Expected Rental Yield (%)</label>
-      <input
-        type="number"
-        name="financials.expectedRentalYield"
-        value={formData.financials.expectedRentalYield}
-        onChange={handleNumberChange}
-        onBlur={calculateDerivedFields}
-        className="w-full p-2 border rounded"
-        min="0"
-        required
-      />
-    </div>
+                {/* Expected Rental Yield */}
+                <div>
+                  <label className="block text-sm font-medium mb-1">Expected Rental Yield (%)</label>
+                  <input
+                    type="number"
+                    name="financials.expectedRentalYield"
+                    value={formData.financials.expectedRentalYield}
+                    onChange={handleNumberChange}
+                    onBlur={calculateDerivedFields}
+                    className="w-full p-2 border rounded"
+                    min="0"
+                    required
+                  />
+                </div>
 
-    {/* Expected Appreciation */}
-    <div>
-      <label className="block text-sm font-medium mb-1">Expected Appreciation (%)</label>
-      <input
-        type="number"
-        name="financials.expectedAppreciation"
-        value={formData.financials.expectedAppreciation}
-        onChange={handleNumberChange}
-        onBlur={calculateDerivedFields}
-        className="w-full p-2 border rounded"
-        min="0"
-        required
-      />
-    </div>
+                {/* Expected Appreciation */}
+                <div>
+                  <label className="block text-sm font-medium mb-1">Expected Appreciation (%)</label>
+                  <input
+                    type="number"
+                    name="financials.expectedAppreciation"
+                    value={formData.financials.expectedAppreciation}
+                    onChange={handleNumberChange}
+                    onBlur={calculateDerivedFields}
+                    className="w-full p-2 border rounded"
+                    min="0"
+                    required
+                  />
+                </div>
 
-    {/* Projected Return */}
-    <div>
-      <label className="block text-sm font-medium mb-1">Projected Return (%)</label>
-      <input
-        type="number"
-        name="financials.projectedReturn"
-        value={formData.financials.projectedReturn}
-        onChange={handleNumberChange}
-        onBlur={calculateDerivedFields}
-        className="w-full p-2 border rounded"
-        min="0"
-        required
-      />
-    </div>
+                {/* Projected Return */}
+                <div>
+                  <label className="block text-sm font-medium mb-1">Projected Return (%)</label>
+                  <input
+                    type="number"
+                    name="financials.projectedReturn"
+                    value={formData.financials.projectedReturn}
+                    onChange={handleNumberChange}
+                    onBlur={calculateDerivedFields}
+                    className="w-full p-2 border rounded"
+                    min="0"
+                    required
+                  />
+                </div>
 
-    {/* Net Operating Income */}
-    <div>
-      <label className="block text-sm font-medium mb-1">Net Operating Income ($)</label>
-      <input
-        type="number"
-        name="financials.netOperatingIncome"
-        value={formData.financials.netOperatingIncome}
-        className="w-full p-2 border rounded bg-gray-100"
-        readOnly
-      />
-    </div>
+                {/* Net Operating Income */}
+                <div>
+                  <label className="block text-sm font-medium mb-1">Net Operating Income ($)</label>
+                  <input
+                    type="number"
+                    name="financials.netOperatingIncome"
+                    value={formData.financials.netOperatingIncome}
+                    className="w-full p-2 border rounded bg-gray-100"
+                    readOnly
+                  />
+                </div>
 
-    {/* Cap Rate */}
-    <div>
-      <label className="block text-sm font-medium mb-1">Cap Rate (%)</label>
-      <input
-        type="number"
-        name="financials.capRate"
-        value={formData.financials.capRate}
-        className="w-full p-2 border rounded bg-gray-100"
-        readOnly
-      />
-    </div>
-  </div>
-</div>
+                {/* Cap Rate */}
+                <div>
+                  <label className="block text-sm font-medium mb-1">Cap Rate (%)</label>
+                  <input
+                    type="number"
+                    name="financials.capRate"
+                    value={formData.financials.capRate}
+                    className="w-full p-2 border rounded bg-gray-100"
+                    readOnly
+                  />
+                </div>
+              </div>
+            </div>
 
 
             <div>

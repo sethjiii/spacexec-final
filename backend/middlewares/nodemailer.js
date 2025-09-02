@@ -125,9 +125,9 @@ const sendVerificationEmail = async (userData) => {
     const token = jwt.sign(userData, process.env.JWT_SECRET, {
       expiresIn: "1d", // token expires in 1 day
     });
-  
-    const verificationUrl = `http://localhost:5000/api/users/verify-registration/${token}`
-  
+
+    const verificationUrl = `${import.meta.env.VITE_BACKEND_URL}/api/users/verify-registration/${token}`
+
     const message = `
       <!DOCTYPE html>
       <html lang="en">

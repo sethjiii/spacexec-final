@@ -25,7 +25,7 @@ const MarketPlaceCheckout2 = () => {
   const [investorName, setInvestorName] = useState("");
   const [email, setEmail] = useState("");
   const [userId, setUserId] = useState("");
-  const [sellerDetails, setSellerDetails] = useState("");
+  const [sellerDetails, setSellerDetails] = useState<{ _id?: string } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -55,7 +55,7 @@ const MarketPlaceCheckout2 = () => {
     setInvestorName(iName);
     setEmail(iEmail);
     setUserId(iUserId);
-    setSellerDetails(location.state?.sellerDetails || {});
+    setSellerDetails(location.state?.sellerDetails || null);
 
     if (!propertyData || !shares || !investmentAmount) {
       navigate("/marketplace");
@@ -84,14 +84,14 @@ const MarketPlaceCheckout2 = () => {
   const buyShares = async () => {
     setIsLoading(true);
     try {
-      const sellerId = sellerDetails._id;
+      const sellerId = sellerDetails?._id;
       const propertyId = propertyData._id;
       const sharesToSell = shares;
       const buyerId = userId;
 
       const baseUrl =
-        process.env.NODE_ENV === "production"
-          ? process.env.NEXT_PUBLIC_BACKEND_URL
+        import.meta.env.MODE === "production"
+          ? import.meta.env.VITE_BACKEND_URL
           : "http://localhost:5000";
 
       const token = localStorage.getItem("token"); // JWT stored after login

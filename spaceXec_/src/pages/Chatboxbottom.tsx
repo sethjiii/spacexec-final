@@ -26,8 +26,8 @@ export default function ChatButton() {
       try {
         const userId = localStorage.getItem("_id");
         const baseUrl =
-          process.env.NODE_ENV === "production"
-            ? process.env.NEXT_PUBLIC_BACKEND_URL
+          import.meta.env.MODE === "production"
+            ? import.meta.env.VITE_BACKEND_URL
             : "http://localhost:5000";
 
         const res = await fetch(

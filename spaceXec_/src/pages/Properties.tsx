@@ -103,8 +103,8 @@ const Properties = () => {
       try {
         setIsLoading(true);
         const baseUrl =
-          process.env.NODE_ENV === "production"
-            ? process.env.NEXT_PUBLIC_BACKEND_URL
+          import.meta.env.MODE === "production"
+            ? import.meta.env.VITE_BACKEND_URL
             : "http://localhost:5000";
         const token = localStorage.getItem("token");
 
@@ -278,7 +278,7 @@ const Properties = () => {
       <div className="pt-16 pb-8 md:pt-20 md:pb-12 bg-[#F2F1ED]">
         <div className="container mx-auto px-4 md:px-6">
           <h1 className="text-2xl md:text-3xl font-light text-[#161616] mb-2">
-            Global Property 
+            Global Property
             <span className="block font-medium text-[#710014]">Investments</span>
           </h1>
           <p className="text-sm md:text-base text-[#B38F6F]">

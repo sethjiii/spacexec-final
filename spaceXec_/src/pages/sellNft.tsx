@@ -80,12 +80,12 @@ const SellNFTPage: React.FC = () => {
       );
     }
   };
-// done
+  // done
   const handleSignature = async () => {
     if (signature && signature.length > 10) {
       const baseUrl =
-        process.env.NODE_ENV === "production"
-          ? process.env.NEXT_PUBLIC_BACKEND_URL
+        import.meta.env.MODE === "production"
+          ? import.meta.env.VITE_BACKEND_URL
           : "http://localhost:5000";
 
       const res = await fetch(`${baseUrl}/api/properties/verifysignature`, {
@@ -95,11 +95,11 @@ const SellNFTPage: React.FC = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-            tokenId: enteredToken,
-            signature,
-            propertyId: property.id,  // assuming property._id should be property.id
-            userId,
-          }),
+          tokenId: enteredToken,
+          signature,
+          propertyId: property.id,  // assuming property._id should be property.id
+          userId,
+        }),
         credentials: "include",
       });
       if (res.ok) {
@@ -128,8 +128,8 @@ const SellNFTPage: React.FC = () => {
       return;
     }
     const baseUrl =
-      process.env.NODE_ENV === "production"
-        ? process.env.NEXT_PUBLIC_BACKEND_URL
+      import.meta.env.MODE === "production"
+        ? import.meta.env.VITE_BACKEND_URL
         : "http://localhost:5000";
 
     const res = await fetch(`${baseUrl}/api/properties/listnft`, {
@@ -138,27 +138,27 @@ const SellNFTPage: React.FC = () => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body:JSON.stringify({
-        sellerId:userId,
-        propertyId:property.id,
-        nftTokenId:enteredToken,
+      body: JSON.stringify({
+        sellerId: userId,
+        propertyId: property.id,
+        nftTokenId: enteredToken,
         sharePercentage,
-        listingPrice:price,
-        pricePerShare:price,
+        listingPrice: price,
+        pricePerShare: price,
       }),
       credentials: "include",
     });
-    const data=await res.json();
+    const data = await res.json();
     console.log(data)
-    if(res.ok){
-        toast.success("NFT listed successfully on marketplace!");
-        setTimeout(() => {
-          navigate("/marketplace");
-        }, 3000);
+    if (res.ok) {
+      toast.success("NFT listed successfully on marketplace!");
+      setTimeout(() => {
+        navigate("/marketplace");
+      }, 3000);
 
-    }else{
-        
-        toast.error(data.message)
+    } else {
+
+      toast.error(data.message)
 
     }
 
@@ -517,22 +517,20 @@ const SellNFTPage: React.FC = () => {
           {/* Step indicators */}
           <div className="flex mb-4">
             <div
-              className={`flex-1 text-center ${
-                step === "token"
-                  ? "text-blue-600"
-                  : step === "signature" || step === "review"
+              className={`flex-1 text-center ${step === "token"
+                ? "text-blue-600"
+                : step === "signature" || step === "review"
                   ? "text-green-600"
                   : "text-gray-400"
-              }`}
+                }`}
             >
               <div
-                className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center border-2 ${
-                  step === "token"
-                    ? "border-blue-600 bg-blue-50"
-                    : step === "signature" || step === "review"
+                className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center border-2 ${step === "token"
+                  ? "border-blue-600 bg-blue-50"
+                  : step === "signature" || step === "review"
                     ? "border-green-600 bg-green-50"
                     : "border-gray-300"
-                }`}
+                  }`}
               >
                 {step === "signature" || step === "review" ? (
                   <CheckCircle size={16} />
@@ -543,38 +541,34 @@ const SellNFTPage: React.FC = () => {
               <span className="text-xs mt-1 block">Verify Token</span>
             </div>
             <div
-              className={`flex-1 text-center ${
-                step === "signature"
-                  ? "text-blue-600"
-                  : step === "review"
+              className={`flex-1 text-center ${step === "signature"
+                ? "text-blue-600"
+                : step === "review"
                   ? "text-green-600"
                   : "text-gray-400"
-              }`}
+                }`}
             >
               <div
-                className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center border-2 ${
-                  step === "signature"
-                    ? "border-blue-600 bg-blue-50"
-                    : step === "review"
+                className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center border-2 ${step === "signature"
+                  ? "border-blue-600 bg-blue-50"
+                  : step === "review"
                     ? "border-green-600 bg-green-50"
                     : "border-gray-300"
-                }`}
+                  }`}
               >
                 {step === "review" ? <CheckCircle size={16} /> : "2"}
               </div>
               <span className="text-xs mt-1 block">Signature</span>
             </div>
             <div
-              className={`flex-1 text-center ${
-                step === "review" ? "text-blue-600" : "text-gray-400"
-              }`}
+              className={`flex-1 text-center ${step === "review" ? "text-blue-600" : "text-gray-400"
+                }`}
             >
               <div
-                className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center border-2 ${
-                  step === "review"
-                    ? "border-blue-600 bg-blue-50"
-                    : "border-gray-300"
-                }`}
+                className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center border-2 ${step === "review"
+                  ? "border-blue-600 bg-blue-50"
+                  : "border-gray-300"
+                  }`}
               >
                 3
               </div>

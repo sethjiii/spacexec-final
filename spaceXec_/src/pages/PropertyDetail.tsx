@@ -93,8 +93,8 @@ const PropertyDetail = () => {
     const fetchPropertyData = async () => {
       try {
         const baseUrl =
-          process.env.NODE_ENV === "production"
-            ? process.env.NEXT_PUBLIC_BACKEND_URL
+          import.meta.env.MODE === "production"
+            ? import.meta.env.VITE_BACKEND_URL
             : "http://localhost:5000";
 
         console.log(
@@ -253,9 +253,8 @@ const PropertyDetail = () => {
                   className="flex items-center gap-1"
                 >
                   <Heart
-                    className={`h-4 w-4 ${
-                      isFavorite ? "fill-red-500 text-red-500" : ""
-                    }`}
+                    className={`h-4 w-4 ${isFavorite ? "fill-red-500 text-red-500" : ""
+                      }`}
                   />
                   {/* {isFavorite ? 'Saved' : 'Save'} */}
                 </Button>
@@ -291,11 +290,10 @@ const PropertyDetail = () => {
               {propertyData.images.slice(0, 4).map((image, index) => (
                 <div
                   key={index}
-                  className={`relative h-[190px] rounded-lg overflow-hidden cursor-pointer transition-opacity ${
-                    index === activeImageIndex
+                  className={`relative h-[190px] rounded-lg overflow-hidden cursor-pointer transition-opacity ${index === activeImageIndex
                       ? "ring-2 ring-primary"
                       : "opacity-80 hover:opacity-100"
-                  }`}
+                    }`}
                   onClick={() => setActiveImageIndex(index)}
                 >
                   <img

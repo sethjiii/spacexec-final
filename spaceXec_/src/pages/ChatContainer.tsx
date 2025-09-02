@@ -26,12 +26,12 @@ export default function ChatBox({ ticketId }: ChatBoxProps) {
   const [messages, setMessages] = useState<string[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [profileImage, setProfileImage] = useState("");
-  const [role,setRole]= useState("");
+  const [role, setRole] = useState("");
 
 
   const baseUrl =
-    process.env.NODE_ENV === "production"
-      ? process.env.NEXT_PUBLIC_BACKEND_URL
+    import.meta.env.MODE === "production"
+      ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:5000";
 
   const token =
@@ -69,7 +69,7 @@ export default function ChatBox({ ticketId }: ChatBoxProps) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ ticketId, message: newMessage,role }), // Prefix customer:
+        body: JSON.stringify({ ticketId, message: newMessage, role }), // Prefix customer:
       });
 
       if (res.ok) {
@@ -110,21 +110,18 @@ export default function ChatBox({ ticketId }: ChatBoxProps) {
             return (
               <div
                 key={index}
-                className={`flex ${
-                  isCustomer ? "justify-end" : "justify-start"
-                }`}
+                className={`flex ${isCustomer ? "justify-end" : "justify-start"
+                  }`}
               >
                 {/* Profile Avatar Section */}
                 <div
                   key={index}
-                  className={`flex ${
-                    !isCustomer ? "justify-end" : "justify-start"
-                  }`}
+                  className={`flex ${!isCustomer ? "justify-end" : "justify-start"
+                    }`}
                 >
                   <div
-                    className={`flex items-center gap-2 ${
-                      isCustomer ? "flex-row-reverse" : "flex-row"
-                    }`}
+                    className={`flex items-center gap-2 ${isCustomer ? "flex-row-reverse" : "flex-row"
+                      }`}
                   >
                     {/* Profile Avatar */}
                     {!isCustomer ? (
@@ -139,11 +136,10 @@ export default function ChatBox({ ticketId }: ChatBoxProps) {
 
                     {/* Message Section */}
                     <div
-                      className={`max-w-xs p-3 rounded-lg ${
-                        !isCustomer
+                      className={`max-w-xs p-3 rounded-lg ${!isCustomer
                           ? "bg-blue-600 text-white"
                           : "bg-gray-700 text-white"
-                      }`}
+                        }`}
                     >
                       {message}
                     </div>

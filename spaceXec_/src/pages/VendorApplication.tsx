@@ -253,8 +253,8 @@ const VendorApplication = () => {
     try {
       console.log("📤 Sending vendor application data:", formData);
       const baseUrl =
-        process.env.NODE_ENV === "production"
-          ? process.env.NEXT_PUBLIC_BACKEND_URL
+        import.meta.env.MODE === "production"
+          ? import.meta.env.VITE_BACKEND_URL
           : "http://localhost:5000";
 
       const token = localStorage.getItem("token"); // JWT stored after login

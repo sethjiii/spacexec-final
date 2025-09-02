@@ -16,8 +16,8 @@ export default function NewTicketForm({ onBack }: { onBack: () => void }) {
     try {
       const userId = localStorage.getItem("_id");
       const baseUrl =
-        process.env.NODE_ENV === "production"
-          ? process.env.NEXT_PUBLIC_BACKEND_URL
+        import.meta.env.MODE === "production"
+          ? import.meta.env.VITE_BACKEND_URL
           : "http://localhost:5000";
 
       const res = await fetch(`${baseUrl}/api/users/addcomplaint`, {
@@ -35,13 +35,13 @@ export default function NewTicketForm({ onBack }: { onBack: () => void }) {
       const data = await res.json();
 
       if (res.ok) {
-             toast.success("Ticket Raised successfully");
+        toast.success("Ticket Raised successfully");
         onBack(); // Go back to the ticket list
       } else {
-             toast.error("Failed to create ticket");
+        toast.error("Failed to create ticket");
       }
     } catch (error) {
-        toast.error("Failed to create ticket");
+      toast.error("Failed to create ticket");
     } finally {
       setLoading(false);
     }
