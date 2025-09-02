@@ -27,6 +27,7 @@ const {
     getAllChannelPartner, 
     upgradeUserToChannelPartner 
 } = require('../controllers/channelPartnerController');
+const { auth, isAdmin, isVendor, isVendorOrAdmin } = require('../middlewares/verifyAuth');
 
 const userRouter = express.Router();
 
@@ -39,49 +40,49 @@ userRouter.post('/resetpassword', resetPassword);
 userRouter.get('/verify-registration/:token', completeRegistration);
 userRouter.post('/login', loginUser);
 userRouter.post('/loginwithemail', loginWithEmailPassword);
-userRouter.post('/logout', logout);
+userRouter.post('/logout',auth, logout);
 
 // ========================
 // Complaints / Support
 // ========================
-userRouter.post('/addcomplaint', addComplaint);
-userRouter.post('/addchat', addChatToTicket);
-userRouter.get('/getchat/:supportId', findTicketBySupportId);
-userRouter.get('/activetickets/:userId', getActiveSupportTickets);
+userRouter.post('/addcomplaint',auth,addComplaint);
+userRouter.post('/addchat',auth, addChatToTicket);
+userRouter.get('/getchat/:supportId',auth, findTicketBySupportId);
+userRouter.get('/activetickets/:userId',auth,getActiveSupportTickets);
 
 // ========================
 // Dashboard & Profile
 // ========================
-userRouter.get('/dashboard/:userId', dashboarddata);
-userRouter.post('/verify-nft', verifyNFTOwnership);
-userRouter.get('/all', getAllUsers);
-userRouter.delete('/delete/:userId', deleteUser);
+userRouter.get('/dashboard/:userId', auth, dashboarddata);
+userRouter.post('/verify-nft', auth, verifyNFTOwnership);
+userRouter.get('/all', auth, isAdmin, getAllUsers); 
+userRouter.delete('/delete/:userId', auth, isAdmin, deleteUser); 
 
 // ========================
 // Admin Routes
 // ========================
-userRouter.post('/admindashboard', admindashboarddata);
-userRouter.post('/admindashboard/usersdata', alluserdata);
-userRouter.post('/admindashboard/vendorsdata', allvendordata);
+userRouter.post('/admindashboard', auth, isAdmin, admindashboarddata);
+userRouter.post('/admindashboard/usersdata', auth, isAdmin, alluserdata);
+userRouter.post('/admindashboard/vendorsdata', auth, isAdmin, allvendordata);
 
 // ========================
 // Vendor Routes
 // ========================
-userRouter.post('/vendordashboard/:vendorId', vendordashboarddata);
+userRouter.post('/vendordashboard/:vendorId', auth, isVendor, vendordashboarddata);
 
 // ========================
 // Channel Partner Routes
 // ========================
-userRouter.post('/channelpartner/create', createChannelPartner);
-userRouter.post('/getallchannelpartner', getAllChannelPartner);
-userRouter.post('/upgrade-user', upgradeUserToChannelPartner);
-userRouter.post('/channelpartner/addleads', addLeadUserByChannelPartner);
-userRouter.get('/channelpartner/getallleads/:userId', getChannelPartnerByUserId);
+userRouter.post('/channelpartner/create', auth, createChannelPartner);
+userRouter.post('/getallchannelpartner', auth, isAdmin, getAllChannelPartner); // ✅ only admins should fetch all
+userRouter.post('/upgrade-user', auth, isAdmin, upgradeUserToChannelPartner); // ✅ admin action
+userRouter.post('/channelpartner/addleads', auth, isVendorOrAdmin, addLeadUserByChannelPartner);
+userRouter.get('/channelpartner/getallleads/:userId', auth, isVendorOrAdmin, getChannelPartnerByUserId);
 
 // ========================
 // Notifications Route
 // ========================
-userRouter.get('/notifications/:userId', async (req, res) => {
+userRouter.get('/notifications/:userId',auth, async (req, res) => {
     try {
         const { userId } = req.params;
         const user = await User.findById(userId).select("notifications");
@@ -103,6 +104,6 @@ userRouter.get('/notifications/:userId', async (req, res) => {
 // ========================
 // User Profile (keep last to avoid route conflicts)
 // ========================
-userRouter.get('/:userId', getUserProfile);
+userRouter.get('/:userId', auth,getUserProfile);
 
 module.exports = userRouter;

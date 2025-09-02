@@ -394,7 +394,7 @@ const AdminDashboard = () => {
     }
 
     try {
-      const token = getAuthToken();
+      const token = getAuthToken(); // Your helper to get the JWT
       const baseUrl =
         process.env.NODE_ENV === "production"
           ? process.env.NEXT_PUBLIC_BACKEND_URL
@@ -403,14 +403,16 @@ const AdminDashboard = () => {
       const res = await fetch(
         `${baseUrl}/api/properties/disable/${propertyId}`,
         {
-          method: "PUT", // PATCH for disabling
+          method: "PUT", // ✅ use PUT or PATCH depending on your API
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`, // ✅ attach JWT
           },
-          credentials: "include",
+          credentials: "include", // keep if backend uses cookies
         }
       );
+
+      const data = await res.json();
 
       if (res.ok) {
         toast.success("Property disabled successfully!");
@@ -520,8 +522,14 @@ const AdminDashboard = () => {
             ? process.env.NEXT_PUBLIC_BACKEND_URL
             : "http://localhost:5000";
 
+        const token = localStorage.getItem("token"); // JWT stored after login
+
         const response = await fetch(`${baseUrl}/api/users/admindashboard`, {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // ✅ attach JWT
+          },
         });
 
         const data = await response.json();
@@ -564,10 +572,16 @@ const AdminDashboard = () => {
           ? process.env.NEXT_PUBLIC_BACKEND_URL
           : "http://localhost:5000";
 
+      const token = localStorage.getItem("token"); // JWT stored after login
+
       const response = await fetch(
         `${baseUrl}/api/users/admindashboard/usersdata`,
         {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // ✅ attach JWT
+          },
         }
       );
 
@@ -592,11 +606,18 @@ const AdminDashboard = () => {
           ? process.env.NEXT_PUBLIC_BACKEND_URL
           : "http://localhost:5000";
 
+      const token = localStorage.getItem("token"); // JWT stored after login
+
       const response = await fetch(`${baseUrl}/api/properties/all`, {
         method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // ✅ attach JWT
+        },
       });
 
       const data = await response.json();
+
       setProperties(data);
       if (!response.ok) {
         throw new Error(`Error: ${response.status} ${response.statusText}`);
@@ -610,8 +631,6 @@ const AdminDashboard = () => {
     }
   };
 
-
-
   const channelPartnerFilterFromUser = async () => {
     try {
       const baseUrl =
@@ -619,10 +638,16 @@ const AdminDashboard = () => {
           ? process.env.NEXT_PUBLIC_BACKEND_URL
           : "http://localhost:5000";
 
+      const token = localStorage.getItem("token"); // JWT stored after login
+
       const response = await fetch(
         `${baseUrl}/api/users/getallchannelpartner`,
         {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // ✅ attach JWT
+          },
         }
       );
 
@@ -646,24 +671,29 @@ const AdminDashboard = () => {
   const upgradeUserToChannelPartner = async (userId) => {
     try {
       const baseUrl =
-        process.env.NODE_ENV === "production"
-          ? process.env.NEXT_PUBLIC_BACKEND_URL
-          : "http://localhost:5000";
-  
-      const response = await fetch(`${baseUrl}/api/users/upgrade-user`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userId }),
-      });
-  
-      const data = await response.json();
-  
+  process.env.NODE_ENV === "production"
+    ? process.env.NEXT_PUBLIC_BACKEND_URL
+    : "http://localhost:5000";
+
+const token = localStorage.getItem("token"); // JWT stored after login
+
+const response = await fetch(`${baseUrl}/api/users/upgrade-user`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${token}`, // ✅ attach JWT
+  },
+  body: JSON.stringify({ userId }),
+});
+
+const data = await response.json();
+
+
+
       if (!response.ok) {
         throw new Error(data.message || "Failed to upgrade user.");
       }
-  
+
       console.log("User upgraded to channel partner:", data);
       alert("User successfully upgraded to channel partner!");
       // Optionally refresh the list or update UI state
@@ -672,7 +702,6 @@ const AdminDashboard = () => {
       alert(`Error: ${error.message}`);
     }
   };
-  
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -719,8 +748,6 @@ const AdminDashboard = () => {
     propertyFilter === "all"
       ? properties
       : properties.filter((property) => property.status === propertyFilter);
-
-
 
   const filteredChannelPartners =
     channelPartnerFilter === "all"
@@ -829,7 +856,7 @@ const AdminDashboard = () => {
             </Button> */}
           </div>
         </nav>
-         <div className="p-4 border-t border-gray-100">
+        <div className="p-4 border-t border-gray-100">
           <Button
             variant="ghost"
             className="w-full justify-start text-gray-700"
@@ -853,10 +880,7 @@ const AdminDashboard = () => {
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                     <Search className="h-4 w-4" />
                   </span>
-                  <Input
-                    placeholder="Search..."
-                    className="pl-10 max-w-xs"
-                  />
+                  <Input placeholder="Search..." className="pl-10 max-w-xs" />
                 </div>
                 <Button>
                   <Search className="h-4 w-4 mr-2" />
@@ -940,9 +964,7 @@ const AdminDashboard = () => {
                   <Ticket className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">
-                    {tickets.length}
-                  </div>
+                  <div className="text-2xl font-bold">{tickets.length}</div>
                   <div className="flex justify-between pt-3">
                     <p className="text-xs flex items-center text-muted-foreground font-semibold text-red-400">
                       {adminParams.formattedTicketStatusCounts.in_progress} open
@@ -1170,7 +1192,7 @@ const AdminDashboard = () => {
                               ✕
                             </div>
                             <div></div>
-                            <ChatBox  ticketId={selectedTicketId} />
+                            <ChatBox ticketId={selectedTicketId} />
                           </div>
                         </div>
                       )}
@@ -1522,9 +1544,7 @@ const AdminDashboard = () => {
                           <td className="px-6 py-4">{partner.location}</td>
                           <td className="px-6 py-4">
                             <span className={`px-2 py-1 rounded-full text-xs`}>
-                              {!partner.status ?
-                                "pending":"approved"}
-                            
+                              {!partner.status ? "pending" : "approved"}
                             </span>
                           </td>
                           <td className="px-6 py-4">
@@ -1539,14 +1559,11 @@ const AdminDashboard = () => {
                                   );
                                   if (confirmed) {
                                     // call your upgrade function here
-                                    upgradeUserToChannelPartner(partner.id) // replace with your actual function
+                                    upgradeUserToChannelPartner(partner.id); // replace with your actual function
                                   }
                                 }}
                               >
-                                <FaCheck
-                                  className="h-4 w-4 text-green-500 cursor-pointer"
-                                  
-                                />
+                                <FaCheck className="h-4 w-4 text-green-500 cursor-pointer" />
                               </Button>
                               <Button
                                 variant="ghost"

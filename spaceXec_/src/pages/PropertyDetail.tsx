@@ -102,7 +102,15 @@ const PropertyDetail = () => {
           `${baseUrl}/api/properties/${id}`
         );
 
-        const response = await fetch(`${baseUrl}/api/properties/${id}`);
+        const token = localStorage.getItem("token"); // JWT stored after login
+
+        const response = await fetch(`${baseUrl}/api/properties/${id}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // ✅ send JWT
+          },
+        });
 
         console.log("Fetch response status:", response.status);
 
@@ -480,8 +488,7 @@ const PropertyDetail = () => {
                               Property Price
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                              ₹
-                              {propertyData.financials.propertyPrice}
+                              ₹{propertyData.financials.propertyPrice}
                             </td>
                           </tr>
                           <tr>
@@ -489,8 +496,7 @@ const PropertyDetail = () => {
                               Stamp Duty
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                              ₹
-                              {propertyData.financials.stampDuty}
+                              ₹{propertyData.financials.stampDuty}
                             </td>
                           </tr>
                           <tr>
@@ -498,8 +504,7 @@ const PropertyDetail = () => {
                               Registration Fee
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                              ₹
-                              {propertyData.financials.registrationFee}
+                              ₹{propertyData.financials.registrationFee}
                             </td>
                           </tr>
                           <tr>
@@ -507,8 +512,7 @@ const PropertyDetail = () => {
                               Legal Fee
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                              ₹
-                              {propertyData.financials.legalFee}
+                              ₹{propertyData.financials.legalFee}
                             </td>
                           </tr>
                           <tr className="bg-gray-50">
@@ -516,8 +520,7 @@ const PropertyDetail = () => {
                               Total Investment
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                              ₹
-                              {propertyData.financials.totalInvestment}
+                              ₹{propertyData.financials.totalInvestment}
                             </td>
                           </tr>
                         </tbody>
@@ -616,8 +619,7 @@ const PropertyDetail = () => {
                           Minimum Investment
                         </span>
                         <span className="font-medium">
-                          ₹
-                          {propertyData.offeringDetails.minInvestment}
+                          ₹{propertyData.offeringDetails.minInvestment}
                         </span>
                       </div>
                       <div className="flex flex-col rounded-md bg-gray-50 p-3">
@@ -625,8 +627,7 @@ const PropertyDetail = () => {
                           Maximum Investment
                         </span>
                         <span className="font-medium">
-                          ₹
-                          {propertyData.offeringDetails.maxInvestment}
+                          ₹{propertyData.offeringDetails.maxInvestment}
                         </span>
                       </div>
                       <div className="flex flex-col rounded-md bg-gray-50 p-3">
@@ -654,32 +655,31 @@ const PropertyDetail = () => {
 
           {/* Right Column: Investment Card */}
           <div>
-  <div className="sticky top-24 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-    
-    {/* Simple descriptive text */}
-    <p className="text-sm text-gray-600 mb-4">
-      Explore this investment opportunity and take a step toward financial growth.
-    </p>
+            <div className="sticky top-24 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+              {/* Simple descriptive text */}
+              <p className="text-sm text-gray-600 mb-4">
+                Explore this investment opportunity and take a step toward
+                financial growth.
+              </p>
 
-    {/* Contact & Invest Buttons */}
-    <div className="space-y-3">
-      <Link
-        to={`/invest/${propertyData._id}`}
-        className="w-full justify-center gap-2 flex items-center px-4 py-2 text-gray-800 bg-yellow-200 hover:bg-gray-100"
-      >
-        Invest Now
-      </Link>
-      {/* <Link
+              {/* Contact & Invest Buttons */}
+              <div className="space-y-3">
+                <Link
+                  to={`/invest/${propertyData._id}`}
+                  className="w-full justify-center gap-2 flex items-center px-4 py-2 text-gray-800 bg-yellow-200 hover:bg-gray-100"
+                >
+                  Invest Now
+                </Link>
+                {/* <Link
         to={`tel:${propertyData.vendorInfo.phone}`}
         className="w-full justify-center gap-2 flex items-center px-4 py-2 text-gray-800 bg-yellow-200 hover:bg-gray-100"
       >
         <Phone className="h-4 w-4" />
         Contact vendor
       </Link> */}
-    </div>
-  </div>
-</div>
-
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

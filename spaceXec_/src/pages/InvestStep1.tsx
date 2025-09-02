@@ -23,7 +23,18 @@ const InvestPage = () => {
             ? process.env.REACT_APP_BACKEND_URL
             : "http://localhost:5000";
 
-        const response = await fetch(`${baseUrl}/api/properties/${propertyId}`);
+        const token = localStorage.getItem("token"); // JWT stored after login
+
+        const response = await fetch(
+          `${baseUrl}/api/properties/${propertyId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`, // ✅ send JWT
+            },
+          }
+        );
         if (!response.ok) throw new Error("Failed to fetch property data");
 
         const data = await response.json();
@@ -38,7 +49,7 @@ const InvestPage = () => {
     // Retrieve investor details from local storage
     setInvestorName(localStorage.getItem("name") || "");
     setEmail(localStorage.getItem("email") || "");
-    setUserId(localStorage.getItem('_id'));
+    setUserId(localStorage.getItem("_id"));
 
     fetchPropertyData();
   }, [propertyId]);
@@ -57,7 +68,15 @@ const InvestPage = () => {
     }
 
     navigate("/invest/review", {
-      state: { propertyData, investorName, investmentAmount, email, shares,userId,propertyId },
+      state: {
+        propertyData,
+        investorName,
+        investmentAmount,
+        email,
+        shares,
+        userId,
+        propertyId,
+      },
     });
   };
 
@@ -89,25 +108,33 @@ const InvestPage = () => {
       )}
 
       {/* Property Details */}
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">{propertyData.name}</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-4">
+        {propertyData.name}
+      </h2>
       <p className="text-gray-600">{propertyData.location}</p>
 
       {/* Key Highlights */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
         <div className="bg-gray-100 rounded-lg p-4">
           <h3 className="text-lg font-bold text-gray-800 mb-2">Yield</h3>
-          <p className="text-2xl font-bold text-green-500">{propertyData.yield}%</p>
+          <p className="text-2xl font-bold text-green-500">
+            {propertyData.yield}%
+          </p>
         </div>
 
         <div className="bg-gray-100 rounded-lg p-4">
           <h3 className="text-lg font-bold text-gray-800 mb-2">Funding Goal</h3>
-          <p className="text-2xl font-bold text-gray-800">₹{propertyData.fundingGoal}</p>
+          <p className="text-2xl font-bold text-gray-800">
+            ₹{propertyData.fundingGoal}
+          </p>
         </div>
       </div>
 
       {/* Investment Form */}
       <div className="mt-6">
-        <h3 className="text-lg font-bold text-gray-800 mb-4">Investment Details</h3>
+        <h3 className="text-lg font-bold text-gray-800 mb-4">
+          Investment Details
+        </h3>
         <form>
           <div className="mb-4">
             <label htmlFor="investorName" className="block text-gray-700 mb-2">

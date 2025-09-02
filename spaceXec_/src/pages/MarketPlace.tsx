@@ -3,7 +3,6 @@ import { FaEye, FaRupeeSign } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
-
 export default function LuxuryPropertyMarketplace() {
   const catalogRef = useRef(null); // Create a ref
   const navigate = useNavigate();
@@ -15,7 +14,6 @@ export default function LuxuryPropertyMarketplace() {
   const [trendingProperties, setTrendingProperties] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  
 
   // State for UI controls
   const [activeTab, setActiveTab] = useState("all");
@@ -67,12 +65,15 @@ export default function LuxuryPropertyMarketplace() {
             ? process.env.NEXT_PUBLIC_BACKEND_URL
             : "http://localhost:5000";
 
+        const token = localStorage.getItem("token"); // JWT stored after login
+
         const allRes = await fetch(`${baseUrl}/api/properties/getmarketplace`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // ✅ attach JWT
           },
-          body: JSON.stringify({}),
+          body: JSON.stringify({}), // keep body as needed
         });
 
         if (!allRes.ok) {
@@ -847,11 +848,13 @@ export default function LuxuryPropertyMarketplace() {
                         </span>
                       </div>
                     </div>
-                    <button 
-                    className="w-full mt-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold  shadow-md"
-                    onClick={() => {
-                      navigate('/marketplace/buy', { state: { property: selectedProperty} });
-                    }}
+                    <button
+                      className="w-full mt-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold  shadow-md"
+                      onClick={() => {
+                        navigate("/marketplace/buy", {
+                          state: { property: selectedProperty },
+                        });
+                      }}
                     >
                       Purchase NFT Shares
                     </button>

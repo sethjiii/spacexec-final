@@ -21,39 +21,60 @@ const {
     createListing,
     getAllMarketPlace
 } = require('../controllers/propertyController');
-const { isAdmin } = require('../middlewares/isAdmin');
+
 const { verifyNFTOwnership } = require('../controllers/userController');
 const verifyTokenSignature = require('../utils/verifyTokenSignature');
 
+const { auth, isAdmin, isVendor, isVendorOrAdmin } = require('../middlewares/verifyAuth');
+
 const propertyRouter = express.Router();
+
+// ========================
 // Property Management Routes
-propertyRouter.post('/addproperty',addProperty);  // Add a new property (Only if the user owns NFT)
-propertyRouter.post('/togglewishlist/:propertyId', toggleWishList);  // Add a new property (Only if the user owns NFT)
-propertyRouter.post('/buyShares', buyShares);  // Add a new property (Only if the user owns NFT)
-propertyRouter.post('/sellshares', sellShares);  // Add a new property (Only if the user owns NFT)
-propertyRouter.post('/addbyadmin', addPropertyByAdmin);  // Add a new property (Only if the user owns NFT)
-propertyRouter.get('/all', getAllProperties);  // Get all properties (Updated to prevent conflicts)
-propertyRouter.get('/:propertyId', getPropertyById);  // Get a single property by ID
-propertyRouter.delete('/remove/:propertyId', removeProperty);  // Remove a property (Only if the user owns all shares)
+// ========================
 
+// ✅ Only vendors or admins can add properties
+propertyRouter.post('/addproperty', auth, isVendorOrAdmin, addProperty);
 
-// upload images
-propertyRouter.post('/uploadimages',upload.array('files'),uploadImages)
-propertyRouter.post('/uploadpdfs',upload.array('documents'),uploadPDFs)
+// ✅ Toggle wishlist (any logged-in user)
+propertyRouter.post('/togglewishlist/:propertyId', auth, toggleWishList);
 
-propertyRouter.put("/disable/:propertyId", isAdmin, disableProperty);
+// ✅ Buy / Sell shares (must own NFT, so require auth)
+propertyRouter.post('/buyshares', auth, buyShares);
+propertyRouter.post('/sellshares', auth, sellShares);
 
-// Approve Property Route
-propertyRouter.put("/approve/:propertyId", isAdmin, approveProperty);
+// ✅ Only admins can add property directly
+propertyRouter.post('/addbyadmin', auth, isAdmin, addPropertyByAdmin);
 
-// Delete Property Route
-propertyRouter.delete("/delete/:propertyId", isAdmin, deleteProperty);
+// ✅ Anyone logged-in can view properties
+propertyRouter.get('/all', auth, getAllProperties);
+propertyRouter.get('/:propertyId', auth, getPropertyById);
 
+// ✅ Only vendors or admins can remove (burns down to full ownership logic inside controller)
+propertyRouter.delete('/remove/:propertyId', auth, isVendorOrAdmin, removeProperty);
 
-// marketplace urls
-propertyRouter.post("/verifysignature",verifySignature)
-propertyRouter.post("/listnft",createListing)
-propertyRouter.post("/getmarketplace", getAllMarketPlace);
+// ========================
+// Upload Files
+// ========================
+// ✅ Only vendors or admins can upload property assets
+propertyRouter.post('/uploadimages', auth, isVendorOrAdmin, upload.array('files'), uploadImages);
+propertyRouter.post('/uploadpdfs', auth, isVendorOrAdmin, upload.array('documents'), uploadPDFs);
 
+// ========================
+// Admin-only Actions
+// ========================
+
+propertyRouter.put('/disable/:propertyId', auth, isAdmin, disableProperty);
+propertyRouter.put('/approve/:propertyId', auth, isAdmin, approveProperty);
+propertyRouter.delete('/delete/:propertyId', auth, isAdmin, deleteProperty);
+
+// ========================
+// Marketplace
+// ========================
+// ✅ NFT listing requires authentication
+propertyRouter.post('/verifysignature', auth, verifySignature);
+propertyRouter.post('/listnft', auth, createListing);
+// ✅ Marketplace viewing can be open (or keep it auth if sensitive)
+propertyRouter.post('/getmarketplace', auth, getAllMarketPlace);
 
 module.exports = propertyRouter;

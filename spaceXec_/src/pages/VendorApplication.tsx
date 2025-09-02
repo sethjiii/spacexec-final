@@ -125,10 +125,10 @@ const VendorApplication = () => {
   useEffect(() => {
     // Get user data using the utility function
     const user = getUserFromStorage();
-    
+
     if (user && user._id) {
       setUserId(user._id);
-      setFormData(prev => ({ ...prev, userId: user._id }));
+      setFormData((prev) => ({ ...prev, userId: user._id }));
     } else {
       toast.error("Please login to apply as a vendor");
       navigate("/login");
@@ -136,14 +136,14 @@ const VendorApplication = () => {
   }, [navigate]);
 
   const updateFormData = (field: string, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
   const updateAddress = (field: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       businessAddress: {
         ...prev.businessAddress,
@@ -153,7 +153,7 @@ const VendorApplication = () => {
   };
 
   const updateBankInfo = (field: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       bankInfo: {
         ...prev.bankInfo,
@@ -163,21 +163,24 @@ const VendorApplication = () => {
   };
 
   const addServiceArea = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      serviceAreas: [...prev.serviceAreas, { city: "", state: "", zipCode: "" }],
+      serviceAreas: [
+        ...prev.serviceAreas,
+        { city: "", state: "", zipCode: "" },
+      ],
     }));
   };
 
   const removeServiceArea = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       serviceAreas: prev.serviceAreas.filter((_, i) => i !== index),
     }));
   };
 
   const updateServiceArea = (index: number, field: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       serviceAreas: prev.serviceAreas.map((area, i) =>
         i === index ? { ...area, [field]: value } : area
@@ -186,10 +189,10 @@ const VendorApplication = () => {
   };
 
   const toggleSpecialty = (specialty: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       specialties: prev.specialties.includes(specialty)
-        ? prev.specialties.filter(s => s !== specialty)
+        ? prev.specialties.filter((s) => s !== specialty)
         : [...prev.specialties, specialty],
     }));
   };
@@ -197,7 +200,12 @@ const VendorApplication = () => {
   const validateStep = (step: number): boolean => {
     switch (step) {
       case 1:
-        return !!(formData.businessName && formData.businessType && formData.businessLicense && formData.taxId);
+        return !!(
+          formData.businessName &&
+          formData.businessType &&
+          formData.businessLicense &&
+          formData.taxId
+        );
       case 2:
         return !!(
           formData.businessAddress.street &&
@@ -208,7 +216,9 @@ const VendorApplication = () => {
           formData.businessEmail
         );
       case 3:
-        return !!(formData.yearsInBusiness > 0 && formData.specialties.length > 0);
+        return !!(
+          formData.yearsInBusiness > 0 && formData.specialties.length > 0
+        );
       case 4:
         return !!(
           formData.bankInfo.accountHolder &&
@@ -223,14 +233,14 @@ const VendorApplication = () => {
 
   const nextStep = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep(prev => Math.min(prev + 1, 4));
+      setCurrentStep((prev) => Math.min(prev + 1, 4));
     } else {
       toast.error("Please fill in all required fields");
     }
   };
 
   const prevStep = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 1));
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
 
   const handleSubmit = async () => {
@@ -242,8 +252,24 @@ const VendorApplication = () => {
     setIsSubmitting(true);
     try {
       console.log("📤 Sending vendor application data:", formData);
-      const response = await axios.post("http://localhost:5000/api/vendors/apply", formData);
-      
+      const baseUrl =
+        process.env.NODE_ENV === "production"
+          ? process.env.NEXT_PUBLIC_BACKEND_URL
+          : "http://localhost:5000";
+
+      const token = localStorage.getItem("token"); // JWT stored after login
+
+      const response = await axios.post(
+        `${baseUrl}/api/vendors/apply`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // ✅ attach JWT
+          },
+        }
+      );
+
       if (response.status === 201) {
         toast.success("Vendor application submitted successfully!");
         navigate("/dashboard/" + userId);
@@ -251,7 +277,9 @@ const VendorApplication = () => {
     } catch (error: any) {
       console.error("❌ Error submitting application:", error);
       console.error("❌ Error response:", error.response?.data);
-      toast.error(error.response?.data?.message || "Failed to submit application");
+      toast.error(
+        error.response?.data?.message || "Failed to submit application"
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -264,11 +292,7 @@ const VendorApplication = () => {
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Header */}
         <div className="mb-8">
-          <Button
-            variant="ghost"
-            onClick={() => navigate(-1)}
-            className="mb-4"
-          >
+          <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
@@ -288,7 +312,9 @@ const VendorApplication = () => {
             <span className="text-sm font-medium text-gray-700">
               Step {currentStep} of 4
             </span>
-            <span className="text-sm text-gray-500">{Math.round(progress)}%</span>
+            <span className="text-sm text-gray-500">
+              {Math.round(progress)}%
+            </span>
           </div>
           <Progress value={progress} className="h-2" />
         </div>
@@ -320,7 +346,9 @@ const VendorApplication = () => {
                     <Input
                       id="businessName"
                       value={formData.businessName}
-                      onChange={(e) => updateFormData("businessName", e.target.value)}
+                      onChange={(e) =>
+                        updateFormData("businessName", e.target.value)
+                      }
                       placeholder="Enter your business name"
                     />
                   </div>
@@ -328,7 +356,9 @@ const VendorApplication = () => {
                     <Label htmlFor="businessType">Business Type *</Label>
                     <Select
                       value={formData.businessType}
-                      onValueChange={(value) => updateFormData("businessType", value)}
+                      onValueChange={(value) =>
+                        updateFormData("businessType", value)
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select business type" />
@@ -350,7 +380,9 @@ const VendorApplication = () => {
                     <Input
                       id="businessLicense"
                       value={formData.businessLicense}
-                      onChange={(e) => updateFormData("businessLicense", e.target.value)}
+                      onChange={(e) =>
+                        updateFormData("businessLicense", e.target.value)
+                      }
                       placeholder="Enter business license number"
                     />
                   </div>
@@ -376,7 +408,9 @@ const VendorApplication = () => {
                     <Input
                       id="businessPhone"
                       value={formData.businessPhone}
-                      onChange={(e) => updateFormData("businessPhone", e.target.value)}
+                      onChange={(e) =>
+                        updateFormData("businessPhone", e.target.value)
+                      }
                       placeholder="+1 (555) 123-4567"
                     />
                   </div>
@@ -386,7 +420,9 @@ const VendorApplication = () => {
                       id="businessEmail"
                       type="email"
                       value={formData.businessEmail}
-                      onChange={(e) => updateFormData("businessEmail", e.target.value)}
+                      onChange={(e) =>
+                        updateFormData("businessEmail", e.target.value)
+                      }
                       placeholder="contact@yourbusiness.com"
                     />
                   </div>
@@ -409,7 +445,9 @@ const VendorApplication = () => {
                       <Input
                         placeholder="Street Address"
                         value={formData.businessAddress.street}
-                        onChange={(e) => updateAddress("street", e.target.value)}
+                        onChange={(e) =>
+                          updateAddress("street", e.target.value)
+                        }
                       />
                     </div>
                     <div>
@@ -430,14 +468,18 @@ const VendorApplication = () => {
                       <Input
                         placeholder="ZIP Code"
                         value={formData.businessAddress.zipCode}
-                        onChange={(e) => updateAddress("zipCode", e.target.value)}
+                        onChange={(e) =>
+                          updateAddress("zipCode", e.target.value)
+                        }
                       />
                     </div>
                     <div>
                       <Input
                         placeholder="Country"
                         value={formData.businessAddress.country}
-                        onChange={(e) => updateAddress("country", e.target.value)}
+                        onChange={(e) =>
+                          updateAddress("country", e.target.value)
+                        }
                       />
                     </div>
                   </div>
@@ -455,17 +497,29 @@ const VendorApplication = () => {
                       id="yearsInBusiness"
                       type="number"
                       value={formData.yearsInBusiness}
-                      onChange={(e) => updateFormData("yearsInBusiness", e.target.value ? parseInt(e.target.value) : 0)}
+                      onChange={(e) =>
+                        updateFormData(
+                          "yearsInBusiness",
+                          e.target.value ? parseInt(e.target.value) : 0
+                        )
+                      }
                       placeholder="5"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="annualRevenue">Annual Revenue (Optional)</Label>
+                    <Label htmlFor="annualRevenue">
+                      Annual Revenue (Optional)
+                    </Label>
                     <Input
                       id="annualRevenue"
                       type="number"
                       value={formData.annualRevenue}
-                      onChange={(e) => updateFormData("annualRevenue", e.target.value ? parseInt(e.target.value) : 0)}
+                      onChange={(e) =>
+                        updateFormData(
+                          "annualRevenue",
+                          e.target.value ? parseInt(e.target.value) : 0
+                        )
+                      }
                       placeholder="500000"
                     />
                   </div>
@@ -475,11 +529,18 @@ const VendorApplication = () => {
                   <Label>Property Specialties *</Label>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
                     {specialties.map((specialty) => (
-                      <div key={specialty.value} className="flex items-center space-x-2">
+                      <div
+                        key={specialty.value}
+                        className="flex items-center space-x-2"
+                      >
                         <Checkbox
                           id={specialty.value}
-                          checked={formData.specialties.includes(specialty.value)}
-                          onCheckedChange={() => toggleSpecialty(specialty.value)}
+                          checked={formData.specialties.includes(
+                            specialty.value
+                          )}
+                          onCheckedChange={() =>
+                            toggleSpecialty(specialty.value)
+                          }
                         />
                         <Label htmlFor={specialty.value} className="text-sm">
                           {specialty.label}
@@ -497,17 +558,23 @@ const VendorApplication = () => {
                         <Input
                           placeholder="City"
                           value={area.city}
-                          onChange={(e) => updateServiceArea(index, "city", e.target.value)}
+                          onChange={(e) =>
+                            updateServiceArea(index, "city", e.target.value)
+                          }
                         />
                         <Input
                           placeholder="State"
                           value={area.state}
-                          onChange={(e) => updateServiceArea(index, "state", e.target.value)}
+                          onChange={(e) =>
+                            updateServiceArea(index, "state", e.target.value)
+                          }
                         />
                         <Input
                           placeholder="ZIP"
                           value={area.zipCode}
-                          onChange={(e) => updateServiceArea(index, "zipCode", e.target.value)}
+                          onChange={(e) =>
+                            updateServiceArea(index, "zipCode", e.target.value)
+                          }
                         />
                         {formData.serviceAreas.length > 1 && (
                           <Button
@@ -543,7 +610,9 @@ const VendorApplication = () => {
                     <Input
                       id="accountHolder"
                       value={formData.bankInfo.accountHolder}
-                      onChange={(e) => updateBankInfo("accountHolder", e.target.value)}
+                      onChange={(e) =>
+                        updateBankInfo("accountHolder", e.target.value)
+                      }
                       placeholder="Enter account holder name"
                     />
                   </div>
@@ -552,7 +621,9 @@ const VendorApplication = () => {
                     <Input
                       id="bankName"
                       value={formData.bankInfo.bankName}
-                      onChange={(e) => updateBankInfo("bankName", e.target.value)}
+                      onChange={(e) =>
+                        updateBankInfo("bankName", e.target.value)
+                      }
                       placeholder="Enter bank name"
                     />
                   </div>
@@ -564,7 +635,9 @@ const VendorApplication = () => {
                     <Input
                       id="accountNumber"
                       value={formData.bankInfo.accountNumber}
-                      onChange={(e) => updateBankInfo("accountNumber", e.target.value)}
+                      onChange={(e) =>
+                        updateBankInfo("accountNumber", e.target.value)
+                      }
                       placeholder="Enter account number"
                     />
                   </div>
@@ -573,7 +646,9 @@ const VendorApplication = () => {
                     <Input
                       id="routingNumber"
                       value={formData.bankInfo.routingNumber}
-                      onChange={(e) => updateBankInfo("routingNumber", e.target.value)}
+                      onChange={(e) =>
+                        updateBankInfo("routingNumber", e.target.value)
+                      }
                       placeholder="Enter routing number"
                     />
                   </div>
@@ -583,10 +658,13 @@ const VendorApplication = () => {
                   <div className="flex items-start gap-2">
                     <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
                     <div>
-                      <h4 className="font-medium text-blue-900">Security Notice</h4>
+                      <h4 className="font-medium text-blue-900">
+                        Security Notice
+                      </h4>
                       <p className="text-sm text-blue-700 mt-1">
-                        Your banking information is encrypted and secure. We only use this information
-                        for commission payments and will never share it with third parties.
+                        Your banking information is encrypted and secure. We
+                        only use this information for commission payments and
+                        will never share it with third parties.
                       </p>
                     </div>
                   </div>
@@ -605,9 +683,7 @@ const VendorApplication = () => {
               </Button>
 
               {currentStep < 4 ? (
-                <Button onClick={nextStep}>
-                  Next Step
-                </Button>
+                <Button onClick={nextStep}>Next Step</Button>
               ) : (
                 <Button
                   onClick={handleSubmit}

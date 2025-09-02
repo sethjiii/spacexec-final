@@ -1,7 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Copy, Download, Mail, User, CalendarDays, MapPin, FileText, Banknote, Landmark, ShieldCheck } from "lucide-react";
+import {
+  Copy,
+  Download,
+  Mail,
+  User,
+  CalendarDays,
+  MapPin,
+  FileText,
+  Banknote,
+  Landmark,
+  ShieldCheck,
+} from "lucide-react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
@@ -34,7 +45,7 @@ const MarketPlaceCheckout2 = () => {
     nftTokenId,
   } = location.state || {};
 
-  console.log(location.state.investmentAmount)
+  console.log(location.state.investmentAmount);
 
   useEffect(() => {
     const iName = localStorage.getItem("name");
@@ -83,10 +94,13 @@ const MarketPlaceCheckout2 = () => {
           ? process.env.NEXT_PUBLIC_BACKEND_URL
           : "http://localhost:5000";
 
+      const token = localStorage.getItem("token"); // JWT stored after login
+
       const res = await fetch(`${baseUrl}/api/properties/sellshares`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // ✅ attach JWT
         },
         body: JSON.stringify({
           sellerId,
@@ -95,7 +109,7 @@ const MarketPlaceCheckout2 = () => {
           buyerId,
           paymentMethod,
           marketplaceId,
-          investmentAmount
+          investmentAmount,
         }),
       });
 
@@ -133,11 +147,18 @@ const MarketPlaceCheckout2 = () => {
         {/* Header */}
         <div className="text-center border-b border-black pb-4 mb-6">
           <h2 className="text-3xl font-extrabold mb-2">
-            Space<span className="text-red-600">X</span>ec P2P Investment Receipt
+            Space<span className="text-red-600">X</span>ec P2P Investment
+            Receipt
           </h2>
-          <p className="text-sm text-gray-600">Empowering Property Ownership via Blockchain</p>
-          <p className="text-sm text-gray-600">GSTIN: 06AABCU9603R1Z2 | CIN: U74999HR2020PTC123456</p>
-          <p className="text-sm text-gray-600">www.spacexec.com | support@spacexec.com</p>
+          <p className="text-sm text-gray-600">
+            Empowering Property Ownership via Blockchain
+          </p>
+          <p className="text-sm text-gray-600">
+            GSTIN: 06AABCU9603R1Z2 | CIN: U74999HR2020PTC123456
+          </p>
+          <p className="text-sm text-gray-600">
+            www.spacexec.com | support@spacexec.com
+          </p>
         </div>
 
         {/* Investor Info */}
@@ -145,8 +166,12 @@ const MarketPlaceCheckout2 = () => {
           <h3 className="font-semibold text-lg mb-2 flex items-center">
             <User className="w-5 h-5 mr-2" /> Investor Details
           </h3>
-          <p><strong>Name:</strong> {investorName}</p>
-          <p><strong>Email:</strong> {email}</p>
+          <p>
+            <strong>Name:</strong> {investorName}
+          </p>
+          <p>
+            <strong>Email:</strong> {email}
+          </p>
         </div>
 
         {/* Property Info */}
@@ -154,10 +179,20 @@ const MarketPlaceCheckout2 = () => {
           <h3 className="font-semibold text-lg mb-2 flex items-center">
             <Landmark className="w-5 h-5 mr-2" /> Property Details
           </h3>
-          <p><strong>Property Name:</strong> {propertyData?.name}</p>
-          <p><strong>Location:</strong> <MapPin className="inline-block w-4 h-4 mr-1" /> {propertyData?.location}</p>
-          <p><strong>Investment Amount:</strong> ₹{investmentAmount}</p>
-          <p><strong>NFT Token ID:</strong> {nftTokenId}</p>
+          <p>
+            <strong>Property Name:</strong> {propertyData?.name}
+          </p>
+          <p>
+            <strong>Location:</strong>{" "}
+            <MapPin className="inline-block w-4 h-4 mr-1" />{" "}
+            {propertyData?.location}
+          </p>
+          <p>
+            <strong>Investment Amount:</strong> ₹{investmentAmount}
+          </p>
+          <p>
+            <strong>NFT Token ID:</strong> {nftTokenId}
+          </p>
         </div>
 
         {/* Payment Info */}
@@ -165,8 +200,12 @@ const MarketPlaceCheckout2 = () => {
           <h3 className="font-semibold text-lg mb-2 flex items-center">
             <Banknote className="w-5 h-5 mr-2" /> Payment Details
           </h3>
-          <p><strong>Shares Purchased:</strong> {shares}</p>
-          <p><strong>Payment Method:</strong> {paymentMethod}</p>
+          <p>
+            <strong>Shares Purchased:</strong> {shares}
+          </p>
+          <p>
+            <strong>Payment Method:</strong> {paymentMethod}
+          </p>
         </div>
 
         {/* Transaction Info */}
@@ -174,24 +213,45 @@ const MarketPlaceCheckout2 = () => {
           <h3 className="font-semibold text-lg mb-2 flex items-center">
             <FileText className="w-5 h-5 mr-2" /> Transaction Details
           </h3>
-          <p><strong>Transaction ID:</strong> {transactionData.transactionId || <span className="text-gray-500">Pending</span>}</p>
+          <p>
+            <strong>Transaction ID:</strong>{" "}
+            {transactionData.transactionId || (
+              <span className="text-gray-500">Pending</span>
+            )}
+          </p>
           <div className="flex items-center">
-            <p className="mr-2"><strong>Signature:</strong> {transactionData.signature || <span className="text-gray-500">Pending</span>}</p>
+            <p className="mr-2">
+              <strong>Signature:</strong>{" "}
+              {transactionData.signature || (
+                <span className="text-gray-500">Pending</span>
+              )}
+            </p>
             {transactionData.signature && (
-              <button onClick={handleCopy} className="text-black hover:text-gray-600">
+              <button
+                onClick={handleCopy}
+                className="text-black hover:text-gray-600"
+              >
                 <Copy className="w-4 h-4" />
               </button>
             )}
           </div>
-          {copied && <p className="text-green-600 text-xs mt-1">Signature copied!</p>}
-          <p><strong>Issued Date:</strong> {formattedDate}</p>
-          <p><strong>Issued Time:</strong> {formattedTime}</p>
+          {copied && (
+            <p className="text-green-600 text-xs mt-1">Signature copied!</p>
+          )}
+          <p>
+            <strong>Issued Date:</strong> {formattedDate}
+          </p>
+          <p>
+            <strong>Issued Time:</strong> {formattedTime}
+          </p>
         </div>
 
         {/* Note */}
         <div className="text-xs text-gray-700 border-t border-gray-300 pt-3">
           <ShieldCheck className="inline-block w-4 h-4 mr-1" />
-          Signature has been sent to your registered email ({email.slice(0, 3) + "***@gmail.com"}) for future reference. Please keep it safe to verify your ownership.
+          Signature has been sent to your registered email (
+          {email.slice(0, 3) + "***@gmail.com"}) for future reference. Please
+          keep it safe to verify your ownership.
         </div>
       </div>
 
@@ -199,7 +259,10 @@ const MarketPlaceCheckout2 = () => {
 
       {/* Action Buttons */}
       <div className="flex justify-end gap-4 mt-6 border-t border-gray-300 pt-4">
-        <Button onClick={handleDownload} className="bg-black text-white hover:bg-gray-800 px-4 py-2">
+        <Button
+          onClick={handleDownload}
+          className="bg-black text-white hover:bg-gray-800 px-4 py-2"
+        >
           <Download className="w-4 h-4 mr-1" /> Download Receipt
         </Button>
         <Button

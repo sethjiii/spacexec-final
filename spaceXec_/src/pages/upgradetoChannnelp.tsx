@@ -15,11 +15,10 @@ export default function BecomeChannelPartner() {
   useEffect(() => {
     // Your code here runs once when the component mounts
     setFormData((prevData) => ({
-        ...prevData,
-        name: localStorage.getItem('name') || '',
-        email:localStorage.getItem('email')||''
-      }));
-      
+      ...prevData,
+      name: localStorage.getItem("name") || "",
+      email: localStorage.getItem("email") || "",
+    }));
   }, []);
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -30,23 +29,36 @@ export default function BecomeChannelPartner() {
     setMessage("");
     setError("");
 
-    const user = localStorage.getItem('_id'); // assume stored user info
-    console.log(user)
+    const user = localStorage.getItem("_id"); // assume stored user info
+    console.log(user);
     if (!user || !user) {
       setError("User not logged in");
       return;
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/users/channelpartner/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          addedBy: user,
-          user_identity: user,
-        }),
-      });
+      const baseUrl =
+        process.env.NODE_ENV === "production"
+          ? process.env.NEXT_PUBLIC_BACKEND_URL
+          : "http://localhost:5000";
+
+      const token = localStorage.getItem("token"); // JWT stored after login
+
+      const response = await fetch(
+        `${baseUrl}/api/users/channelpartner/create`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // ✅ attach JWT
+          },
+          body: JSON.stringify({
+            ...formData,
+            addedBy: user,
+            user_identity: user,
+          }),
+        }
+      );
 
       const data = await response.json();
 
@@ -54,7 +66,9 @@ export default function BecomeChannelPartner() {
         throw new Error(data.message || "Failed to create channel partner");
       }
 
-      setMessage("Your profile is being push for admin approval, you will be notified after approval. Stay tuned!!!");
+      setMessage(
+        "Your profile is being push for admin approval, you will be notified after approval. Stay tuned!!!"
+      );
     } catch (err) {
       setError(err.message);
     }
@@ -63,7 +77,9 @@ export default function BecomeChannelPartner() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-white px-4 py-8">
       <div className="max-w-md w-full space-y-6">
-        <h2 className="text-2xl font-bold text-center text-black font-mono">Become a Channel Partner</h2>
+        <h2 className="text-2xl font-bold text-center text-black font-mono">
+          Become a Channel Partner
+        </h2>
 
         {message && <div className="text-green-500">{message}</div>}
         {error && <div className="text-red-500">{error}</div>}
@@ -79,7 +95,7 @@ export default function BecomeChannelPartner() {
             onChange={handleChange}
             className="w-full border px-3 py-2 rounded font-mono"
           />
-          
+
           <input
             type="email"
             name="email"
@@ -116,7 +132,7 @@ export default function BecomeChannelPartner() {
             onChange={handleChange}
             className="w-full border px-3 py-2 rounded font-mono"
           />
-          
+
           <button
             type="submit"
             className="w-full bg-[#D4AF37] hover:bg-black hover:text-[#D4AF37] text-black py-2 rounded font-mono"

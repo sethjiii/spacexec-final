@@ -62,14 +62,18 @@ const PropertyCard = ({
         process.env.NODE_ENV === "production"
           ? process.env.NEXT_PUBLIC_BACKEND_URL
           : "http://localhost:5000";
+
+      const token = localStorage.getItem("token"); // JWT from login
+
       const response = await fetch(
         `${baseUrl}/api/properties/togglewishlist/${propertyId}`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // ✅ add token
           },
-          body: JSON.stringify({ userId }),
+          body: JSON.stringify({ userId, isAdding }),
         }
       );
 
@@ -196,12 +200,12 @@ const PropertyCard = ({
             </div>
           </div>
         </div>
-      <Link
-        to={`/property/${_id}`}
-        className="w-full mt-1 justify-center gap-2 flex items-center px-4 py-2 text-gray-800 bg-blue-400 hover:bg-blue-500"
-      >
-        Invest Now
-      </Link>
+        <Link
+          to={`/property/${_id}`}
+          className="w-full mt-1 justify-center gap-2 flex items-center px-4 py-2 text-gray-800 bg-blue-400 hover:bg-blue-500"
+        >
+          Invest Now
+        </Link>
       </div>
     </Link>
   );

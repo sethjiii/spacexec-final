@@ -3,6 +3,7 @@ const User = require('../models/usersModel');
 
 const isVendor = async (req, res, next) => {
     try {
+        
         const userId = req.user?.userId || req.body.userId || req.params.userId;
 
         if (!userId) {

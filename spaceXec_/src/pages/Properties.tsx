@@ -99,6 +99,7 @@ const Properties = () => {
   const [sortOption, setSortOption] = useState("latest");
 
   // Fetch properties from API (using original fetch function)
+  
   useEffect(() => {
     const fetchProperties = async () => {
       try {
@@ -107,7 +108,15 @@ const Properties = () => {
           process.env.NODE_ENV === "production"
             ? process.env.NEXT_PUBLIC_BACKEND_URL
             : "http://localhost:5000";
-        const response = await fetch(`${baseUrl}/api/properties/all`);
+        const token = localStorage.getItem("token"); // or sessionStorage/cookie depending on how you store it
+
+        const response = await fetch(`${baseUrl}/api/properties/all`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // ✅ send JWT
+          },
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch properties");
@@ -443,19 +452,20 @@ const Properties = () => {
         {filteredProperties.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProperties.map((property) => {
-              
               return (
-                property.status === "active" && <LazyLoad
-                  key={property._id}
-                  height={200}
-                  offset={100}
-                  once
-                  placeholder={
-                    <div className="h-[300px] bg-gray-100 rounded-lg animate-pulse" />
-                  }
-                >
-                  <PropertyCard {...property} className="custom-class" />
-                </LazyLoad>
+                property.status === "active" && (
+                  <LazyLoad
+                    key={property._id}
+                    height={200}
+                    offset={100}
+                    once
+                    placeholder={
+                      <div className="h-[300px] bg-gray-100 rounded-lg animate-pulse" />
+                    }
+                  >
+                    <PropertyCard {...property} className="custom-class" />
+                  </LazyLoad>
+                )
               );
             })}
           </div>
