@@ -1,4 +1,6 @@
 const express = require('express');
+const User = require('../models/usersModel'); // ✅ Make sure this matches your actual filename exactly
+
 const {
     registerUser,
     loginUser,
@@ -13,87 +15,94 @@ const {
     forgotPassword,
     resetPassword
 } = require('../controllers/userController');
+
 const { dashboarddata } = require('../controllers/dashboardController');
 const { admindashboarddata, alluserdata, allvendordata } = require('../controllers/adminDashboardController');
 const { addComplaint, getActiveSupportTickets, findTicketBySupportId, addChatToTicket } = require('../controllers/supprtController');
 const { vendordashboarddata } = require('../controllers/vendorDashboardController');
-const { createChannelPartner, addLeadUserByChannelPartner, getChannelPartnerByUserId, getAllChannelPartner, upgradeUserToChannelPartner } = require('../controllers/channelPartnerController');
+const { 
+    createChannelPartner, 
+    addLeadUserByChannelPartner, 
+    getChannelPartnerByUserId, 
+    getAllChannelPartner, 
+    upgradeUserToChannelPartner 
+} = require('../controllers/channelPartnerController');
 
 const userRouter = express.Router();
 
-// User Authentication Routes
-userRouter.post('/register', sendRegistrationLink);  // Register a new user
-userRouter.post('/forgotpassword', forgotPassword);  // Register a new user
-userRouter.post('/resetpassword', resetPassword);  // Register a new user
-userRouter.get('/verify-registration/:token', completeRegistration);  // Register a new user
-userRouter.post('/login', loginUser);  // User login
-userRouter.post('/loginwithemail', loginWithEmailPassword);  // User login
-userRouter.post('/logout', logout);  // User login
+// ========================
+// Auth Routes
+// ========================
+userRouter.post('/register', sendRegistrationLink);
+userRouter.post('/forgotpassword', forgotPassword);
+userRouter.post('/resetpassword', resetPassword);
+userRouter.get('/verify-registration/:token', completeRegistration);
+userRouter.post('/login', loginUser);
+userRouter.post('/loginwithemail', loginWithEmailPassword);
+userRouter.post('/logout', logout);
 
-// complains 
-userRouter.post('/addcomplaint',addComplaint)
-userRouter.post('/addchat',addChatToTicket)
-userRouter.get('/getchat/:supportId',findTicketBySupportId)
-userRouter.get('/activetickets/:userId',getActiveSupportTickets)
+// ========================
+// Complaints / Support
+// ========================
+userRouter.post('/addcomplaint', addComplaint);
+userRouter.post('/addchat', addChatToTicket);
+userRouter.get('/getchat/:supportId', findTicketBySupportId);
+userRouter.get('/activetickets/:userId', getActiveSupportTickets);
 
-// User Profile & Ownership
-userRouter.get('/:userId', getUserProfile);  // Get user profile
-userRouter.get('/dashboard/:userId', dashboarddata);  // Get user profile
-userRouter.post('/verify-nft', verifyNFTOwnership);  // Verify if user owns NFTs
-userRouter.get('/all', getAllUsers);  // Get all users
-userRouter.delete('/delete/:userId', deleteUser);  // Delete user (if no NFTs are owned)
+// ========================
+// Dashboard & Profile
+// ========================
+userRouter.get('/dashboard/:userId', dashboarddata);
+userRouter.post('/verify-nft', verifyNFTOwnership);
+userRouter.get('/all', getAllUsers);
+userRouter.delete('/delete/:userId', deleteUser);
 
+// ========================
+// Admin Routes
+// ========================
+userRouter.post('/admindashboard', admindashboarddata);
+userRouter.post('/admindashboard/usersdata', alluserdata);
+userRouter.post('/admindashboard/vendorsdata', allvendordata);
 
+// ========================
+// Vendor Routes
+// ========================
+userRouter.post('/vendordashboard/:vendorId', vendordashboarddata);
 
-// admin routes
-userRouter.post('/admindashboard',admindashboarddata);
-userRouter.post('/admindashboard/usersdata',alluserdata);
-userRouter.post('/admindashboard/vendorsdata',allvendordata);
+// ========================
+// Channel Partner Routes
+// ========================
+userRouter.post('/channelpartner/create', createChannelPartner);
+userRouter.post('/getallchannelpartner', getAllChannelPartner);
+userRouter.post('/upgrade-user', upgradeUserToChannelPartner);
+userRouter.post('/channelpartner/addleads', addLeadUserByChannelPartner);
+userRouter.get('/channelpartner/getallleads/:userId', getChannelPartnerByUserId);
 
-// vendor routes
-userRouter.post('/vendordashboard/:vendorId',vendordashboarddata);
-
-
-// channel partener routes
-userRouter.post('/channelpartner/create',createChannelPartner);
-userRouter.post('/getallchannelpartner',getAllChannelPartner);
-userRouter.post("/upgrade-user", upgradeUserToChannelPartner);
-userRouter.post('/channelpartner/addleads',addLeadUserByChannelPartner);
-userRouter.get('/channelpartner/getallleads/:userId',getChannelPartnerByUserId);
-module.exports = userRouter;
-
-
-async function sendData() {
+// ========================
+// Notifications Route
+// ========================
+userRouter.get('/notifications/:userId', async (req, res) => {
     try {
-      const response = await fetch('http://localhost:5001/some-endpoint', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ name: 'Jay', age: 22 })
-      });
-  
-      const data = await response.json();
-      console.log('Server response:', data);
+        const { userId } = req.params;
+        const user = await User.findById(userId).select("notifications");
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const notifications = user.notifications || [];
+        const unreadCount = notifications.filter(n => !n.read).length;
+
+        res.json({ notifications, unreadCount });
     } catch (error) {
-      console.error('Fetch error:', error);
+        console.error("Error fetching notifications:", error);
+        res.status(500).json({ error: "Failed to fetch notifications" });
     }
-  }
-  
-  sendData();
+});
 
-  
-  const sendData1=async()=>{
-    try{
-        const res=await fetch('dafa',{
-            method:'post',
-            headers:{
-                'content-Type':express.application
-            }
-        })
+// ========================
+// User Profile (keep last to avoid route conflicts)
+// ========================
+userRouter.get('/:userId', getUserProfile);
 
-    }catch(error){
-        console.log(error);
-    }
-
-  }
+module.exports = userRouter;

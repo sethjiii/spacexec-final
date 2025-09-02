@@ -4,10 +4,9 @@ const jwt = require("jsonwebtoken");
 
 // Create a transporter object using SMTP transport
 const transporter = nodemailer.createTransport({
-    host: 'smtp.hostinger.com',
+    host: 'smtp.gmail.com',
     port: 587,
-secure: false
-,
+    secure: false,
     auth: {
         user: process.env.USER_EMAIL,
         pass: process.env.USER_PASS
@@ -295,6 +294,7 @@ const sendVerificationEmail = async (userData) => {
       }
     });
   };
+  
   
 
 module.exports={sendSpaceXecJoiningEmail,sendVerificationEmail,sendForgotPasswordEmailWithExpiry};
