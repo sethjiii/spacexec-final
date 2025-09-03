@@ -126,7 +126,8 @@ const sendVerificationEmail = async (userData) => {
       expiresIn: "1d", // token expires in 1 day
     });
 
-    const verificationUrl = `${import.meta.env.VITE_BACKEND_URL}/api/users/verify-registration/${token}`
+    const verificationUrl = `${process.env.BACKEND_URL}/api/users/verify-registration/${token}`;
+
 
     const message = `
       <!DOCTYPE html>
